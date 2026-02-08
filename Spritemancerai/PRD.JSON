@@ -1,0 +1,416 @@
+{
+    "product": {
+        "name": "SpriteMancer AI",
+        "codename": "SpriteGen",
+        "category": "AI-Assisted 2D Game Asset Generation",
+        "primary_style": "Pixel Art",
+        "primary_goal": "Generate consistent, game-ready 2D animation spritesheets using a Verification-First, biomechanically grounded AI pipeline.",
+        "core_value_proposition": [
+            "Eliminates temporal hallucination in AI-generated sprites",
+            "Separates reasoning (animation logic) from rendering (pixels)",
+            "Reduces cost via grid-based generation and repair-only regeneration",
+            "Gives developers director-level control over animation intent"
+        ]
+    },
+    "target_users": {
+        "primary": [
+            "Indie Game Developers",
+            "Solo Developers",
+            "Small Studios"
+        ],
+        "secondary": [
+            "Technical Artists",
+            "Prototypers"
+        ],
+        "non_goals": [
+            "Full character rigging",
+            "High-end cinematic animation",
+            "Automatic gameplay balancing"
+        ]
+    },
+    "development_constraints": {
+        "team_size": 1,
+        "timeline_months": 3,
+        "primary_cloud": "Google Cloud Platform",
+        "budget_model": "Pay-per-generation (Gemini API)"
+    },
+    "supported_animation_scope": {
+        "animation_types": [
+            "Idle",
+            "Walk",
+            "Run",
+            "Attack (Light / Heavy / Combo)",
+            "Jump",
+            "Cast",
+            "Hit Reaction",
+            "Death",
+            "Boss Attacks",
+            "Special Abilities"
+        ],
+        "difficulty_tiers": [
+            "LIGHT",
+            "HEAVY",
+            "BOSS"
+        ],
+        "perspectives": [
+            "side",
+            "front",
+            "isometric",
+            "top_down"
+        ]
+    },
+    "core_pipeline": {
+        "stage_1_character_ingestion": {
+            "model": "gemini-3-pro-preview",
+            "thinking_level": "high",
+            "input": [
+                "reference_image"
+            ],
+            "output": "character_dna",
+            "description": "Extracts semantic Character DNA from reference image.",
+            "dna_schema": {
+                "archetype": "string",
+                "body_type": "string",
+                "dominant_colors": [
+                    "hex"
+                ],
+                "equipment": [
+                    "string"
+                ],
+                "weapon_type": "string (System auto-suggests if unspecified)",
+                "weapon_mass": "none|light|medium|heavy|oversized",
+                "special_features": [
+                    "string"
+                ],
+                "anatomical_constraints": [
+                    "string"
+                ]
+            }
+        },
+        "stage_2_dna_verification": {
+            "model": "gemini-3-pro-preview",
+            "description": "Verifies user edits against visual evidence.",
+            "verification_schema": {
+                "claim_verified": "boolean",
+                "visual_evidence": "string",
+                "confidence_score": "float",
+                "action": "UPDATE_DNA|FLAG_AS_NEW_FEATURE"
+            },
+            "rule": "DNA must be explicitly confirmed before proceeding."
+        },
+        "stage_3_action_definition": {
+            "substage_3a_suggestion": {
+                "optional": true,
+                "model": "gemini-3-pro-preview",
+                "output": {
+                    "suggested_actions": [
+                        {
+                            "action": "string",
+                            "difficulty_tiers": [
+                                "LIGHT",
+                                "HEAVY",
+                                "BOSS"
+                            ]
+                        }
+                    ]
+                }
+            },
+            "substage_3b_validation": {
+                "model": "gemini-3-pro-preview",
+                "validates": [
+                    "action_type",
+                    "difficulty_tier"
+                ],
+                "output": {
+                    "status": "VALID|INVALID",
+                    "reason": "string",
+                    "suggested_alternatives": [
+                        "string"
+                    ]
+                }
+            },
+            "substage_3c_frame_budget_auto_scaling": {
+                "model": "gemini-3-pro-preview",
+                "inputs": [
+                    "action_type",
+                    "difficulty_tier",
+                    "weapon_mass",
+                    "perspective"
+                ],
+                "base_frame_budget": {
+                    "Idle": 4,
+                    "Walk": 6,
+                    "Run": 8,
+                    "Light Attack": 6,
+                    "Heavy Attack": 8,
+                    "Combo": 10,
+                    "Jump": 6,
+                    "Cast": 8,
+                    "Death": 10
+                },
+                "multipliers": {
+                    "difficulty": {
+                        "LIGHT": 1.0,
+                        "HEAVY": 1.25,
+                        "BOSS": 1.6
+                    },
+                    "mass": {
+                        "none": 1.0,
+                        "light": 1.0,
+                        "medium": 1.1,
+                        "heavy": 1.25,
+                        "oversized": 1.4
+                    },
+                    "perspective": {
+                        "side": 1.0,
+                        "front": 1.1,
+                        "isometric": 1.2,
+                        "top_down": 0.9
+                    }
+                },
+                "constraints": {
+                    "min_frames": 4,
+                    "max_frames": 16,
+                    "preferred_frames": [
+                        4,
+                        6,
+                        8,
+                        9,
+                        12,
+                        16
+                    ]
+                },
+                "rounding_strategy": "round_half_up",
+                "output": {
+                    "final_frame_count": "integer",
+                    "grid_dim": "2|3|4",
+                    "justification": "string"
+                }
+            }
+        },
+        "stage_4_intent_mirroring": {
+            "model": "gemini-3-pro-preview",
+            "description": "Mirrors acting intent back to user for confirmation.",
+            "output": {
+                "intent_summary": "string",
+                "status": "ALIGNED|EDIT_REQUIRED"
+            }
+        },
+        "stage_5_biomechanical_scripting": {
+            "model": "gemini-3-pro-preview",
+            "thinking_level": "high",
+            "output_schema": {
+                "physics_reasoning": "string",
+                "frames": [
+                    {
+                        "frame_index": "integer",
+                        "phase": "Anticipation|Contact|Recovery|Idle",
+                        "pose_description": "string",
+                        "visual_focus": "string"
+                    }
+                ]
+            },
+            "rule": "Frame count must exactly match Frame Budget output."
+        },
+        "stage_6_image_generation": {
+            "model": "gemini-3-pro-image-preview",
+            "resolution": "4096x4096",
+            "target_style": "Pixel Art",
+            "aspect_ratio": "1:1",
+            "grid_strategy": {
+                "2x2": "4 frames",
+                "3x3": "5-9 frames",
+                "4x4": "10-16 frames"
+            },
+            "prompt_rules": [
+                "Minimum 50px gutter",
+                "Pure white background",
+                "No overlapping limbs",
+                "Strict reference adherence"
+            ]
+        },
+        "stage_7_post_processing": {
+            "opencv_pipeline": {
+                "thresholding": "binary inverse",
+                "noise_removal": "morphological opening",
+                "segmentation": "watershed",
+                "contour_sorting": "row-major clustering"
+            },
+            "pivot_logic": {
+                "grounded": "bottom-center",
+                "jumping_or_flying": "center-of-mass"
+            }
+        },
+        "stage_8_repair_loop": {
+            "granularity": "single-frame",
+            "method": "mask-based edit_image",
+            "rule": "Never regenerate entire grid unless explicitly requested."
+        }
+    },
+    "dual_character_pipeline": {
+        "description": "Extended pipeline for two-character relational animations with temporal causality enforcement.",
+        "generation_modes": [
+            "single",
+            "dual"
+        ],
+        "character_roles": {
+            "instigator": "The attacking/initiating character whose timeline is PRIMARY",
+            "responder": "The reacting character whose timeline is DERIVED from instigator"
+        },
+        "stage_1b_dual_dna_extraction": {
+            "model": "gemini-3-pro-preview",
+            "thinking_level": "high",
+            "input": [
+                "instigator_reference_image",
+                "responder_reference_image"
+            ],
+            "output": {
+                "instigator_dna": "CharacterDNA",
+                "responder_dna": "CharacterDNA",
+                "interaction_constraints": "InteractionConstraints"
+            },
+            "interaction_constraints_schema": {
+                "reach_advantage": "A|B|equal",
+                "speed_advantage": "A|B|equal",
+                "mass_ratio": "float (0.1-10.0)",
+                "likely_responses": [
+                    "dodge",
+                    "block",
+                    "partial_hit",
+                    "full_hit"
+                ]
+            }
+        },
+        "stage_2b_responder_action_suggestion": {
+            "model": "gemini-3-pro-preview",
+            "thinking_level": "high",
+            "input": [
+                "instigator_action",
+                "instigator_dna",
+                "responder_dna",
+                "interaction_constraints"
+            ],
+            "output": {
+                "suggested_actions": [
+                    {
+                        "action": "string",
+                        "reason": "physics/biomechanics explanation",
+                        "recommended": "boolean"
+                    }
+                ],
+                "requires_user_confirmation": "boolean"
+            },
+            "default_responder_actions": [
+                "Backstep Dodge",
+                "Staggered Hit",
+                "Full Impact",
+                "Block",
+                "Counter"
+            ]
+        },
+        "stage_5b_responder_script_derivation": {
+            "model": "gemini-3-pro-preview",
+            "thinking_level": "high",
+            "temporal_binding_rules": {
+                "frame_count_must_match": true,
+                "impact_window_alignment": "Responder reaction starts at instigator's impact_window frames",
+                "phase_mapping": {
+                    "instigator_anticipation": "responder_anticipation_or_ready",
+                    "instigator_contact": "responder_impact_received_or_evade",
+                    "instigator_followthrough": "responder_stagger_or_recovery",
+                    "instigator_recovery": "responder_recovery"
+                }
+            },
+            "responder_frame_schema": {
+                "frame_index": "integer",
+                "phase": "Anticipation|Contact|Recovery|Idle",
+                "pose_description": "string",
+                "visual_focus": "string",
+                "impact_window": "boolean (true when receiving hit)",
+                "force_vector": "knockback direction (opposite of instigator)"
+            }
+        },
+        "dual_stages": {
+            "1": "Dual DNA Extraction (both characters + interaction)",
+            "2": "DNA Verification (optional, per-character)",
+            "3": "Instigator Action Definition (frame budget)",
+            "4": "Responder Action Suggestion",
+            "5": "Intent Mirroring (auto-confirm for dual)",
+            "6": "Instigator Biomechanical Script (PRIMARY)",
+            "7": "Responder Script Derivation (BOUND to instigator)",
+            "8": "Instigator Image Generation",
+            "9": "Responder Image Generation",
+            "10": "Post-Processing (both spritesheets)"
+        },
+        "api_endpoints": {
+            "generate_script": "/api/pipeline/dual/generate-script",
+            "confirm_responder": "/api/pipeline/dual/confirm-responder",
+            "generate_sprites": "/api/pipeline/dual/generate-sprites",
+            "get_status": "/api/pipeline/dual/{project_id}/status"
+        },
+        "database_fields": {
+            "generation_mode": "text (single|dual)",
+            "responder_reference_url": "text",
+            "responder_dna": "jsonb",
+            "interaction_constraints": "jsonb",
+            "responder_animation_script": "jsonb",
+            "responder_spritesheet_url": "text",
+            "responder_frame_urls": "text[]"
+        }
+    },
+    "frontend": {
+        "framework": "Next.js (React)",
+        "key_views": [
+            "DNA Lab (supports dual mode)",
+            "Director Booth (action + responder selection)",
+            "Storyboard Editor (dual script preview)",
+            "Sprite Preview Player",
+            "Repair Tool"
+        ],
+        "dual_mode_features": [
+            "Mode toggle (single/dual)",
+            "Dual image upload",
+            "Responder action selection",
+            "Side-by-side script preview",
+            "Synchronized sprite playback"
+        ],
+        "features": [
+            "WebSocket progress streaming",
+            "Onion skinning",
+            "Frame-by-frame inspection",
+            "Manual pivot override"
+        ]
+    },
+    "backend": {
+        "framework": "FastAPI",
+        "async": "WebSockets + Redis",
+        "storage": "Google Cloud Storage",
+        "state_management": {
+            "session_store": "Redis",
+            "ttl_hours": 24
+        }
+    },
+    "cost_model": {
+        "primary_strategy": "4K Grid Generation",
+        "fallback": "Individual Frame Repair",
+        "estimated_cost_per_animation": {
+            "grid_method": "$0.24",
+            "repair_frame": "$0.03-$0.10"
+        }
+    },
+    "deployment": {
+        "platform": "Cloud Run",
+        "scaling": "scale-to-zero",
+        "timeouts": "WebSocket streaming enabled",
+        "security": [
+            "rate limiting",
+            "credit quotas"
+        ]
+    },
+    "success_criteria": [
+        "Consistent character identity across frames",
+        "No temporal hallucination",
+        "Predictable cost per animation",
+        "Game-engine-ready output"
+    ]
+}

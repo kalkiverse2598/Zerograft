@@ -1,0 +1,50 @@
+#!/usr/bin/env python
+# gdCEF Module Build Script
+# CEF is loaded dynamically via cef_load_library() - DO NOT link framework statically
+
+import os
+
+Import("env")
+Import("env_modules")
+
+env_gdcef = env_modules.Clone()
+
+# CEF SDK path - using absolute path because module is symlinked
+cef_base = "/Users/praveengupta/KalkiVerse/godot/Spritmaker-2/godot/src/agentic-godot"
+cef_sdk_path = cef_base + "/gdcef/addons/gdcef/thirdparty/cef_binary"
+
+# macOS-specific CEF settings
+if env["platform"] == "macos":
+    # Add CEF SDK include paths to module env
+    env_gdcef.Append(CPPPATH=[
+        cef_sdk_path,
+        cef_sdk_path + "/include",
+    ])
+    
+    # CEF artifacts path define
+    env_gdcef.Append(CPPDEFINES=[
+        "CEF_ARTIFACTS_FOLDER=\"cef_artifacts\"",
+    ])
+    
+    # Link libcef_dll_wrapper.a (built via cmake in cef_binary/build)
+    # This provides the C++ wrapper classes around the CEF C API
+    wrapper_lib_path = cef_sdk_path + "/build/libcef_dll_wrapper"
+    env.Append(LIBPATH=[wrapper_lib_path])
+    env.Append(LIBS=["cef_dll_wrapper"])
+    
+    # DO NOT link CEF framework statically - we load it dynamically via cef_load_library()
+    # This avoids the "Class X is implemented in both..." warnings and crashes
+    
+    # Required macOS system frameworks for CEF
+    env.Append(FRAMEWORKS=[
+        "AppKit",
+        "CoreFoundation", 
+        "CoreGraphics",
+        "CoreServices",
+        "Foundation",
+        "IOSurface",
+        "Security",
+    ])
+
+# Sources - our module files
+env_gdcef.add_source_files(env.modules_sources, "*.cpp")

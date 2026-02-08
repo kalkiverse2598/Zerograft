@@ -1,0 +1,33 @@
+{
+    "name": "@agentic-godot/mcp-server-godot",
+    "version": "0.1.0",
+    "description": "MCP Server for Godot engine operations",
+    "main": "dist/index.js",
+    "type": "module",
+    "scripts": {
+        "build": "tsc",
+        "start": "node dist/index.js",
+        "dev": "tsx watch src/index.ts",
+        "test": "npx tsx src/tests/phase0.test.ts && npx tsx src/tests/phase0-integration.test.ts && npx tsx src/tests/phase1-recipes.test.ts && npx tsx src/tests/phase2-context.test.ts && npx tsx src/tests/phase3-bridge.test.ts && npx tsx src/tests/phase4-small-tasks.test.ts",
+        "test:phase0": "npx tsx src/tests/phase0.test.ts && npx tsx src/tests/phase0-integration.test.ts",
+        "test:phase1": "npx tsx src/tests/phase1-recipes.test.ts",
+        "test:phase2": "npx tsx src/tests/phase2-context.test.ts",
+        "test:phase3": "npx tsx src/tests/phase3-bridge.test.ts",
+        "test:phase4": "npx tsx src/tests/phase4-small-tasks.test.ts",
+        "test:unit": "npx tsx src/tests/phase0.test.ts",
+        "test:integration": "npx tsx src/tests/phase0-integration.test.ts && npx tsx src/tests/phase2-context.test.ts"
+    },
+    "dependencies": {
+        "@google/generative-ai": "^0.24.1",
+        "@modelcontextprotocol/sdk": "^1.0.0",
+        "dotenv": "^17.2.3",
+        "jsonrepair": "^3.13.2",
+        "ws": "^8.19.0"
+    },
+    "devDependencies": {
+        "@types/node": "^20.10.0",
+        "@types/ws": "^8.5.10",
+        "tsx": "^4.7.0",
+        "typescript": "^5.3.0"
+    }
+}

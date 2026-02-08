@@ -1,0 +1,61 @@
+# Caddyfile - Reverse proxy with automatic HTTPS
+# Domain: zerograft.online
+
+# SpriteMancer Frontend
+spritemancer.zerograft.online {
+    reverse_proxy frontend:3000
+}
+
+# SpriteMancer Backend API
+api.zerograft.online {
+    reverse_proxy backend:8000
+    
+    # Enable WebSocket support
+    @websockets {
+        header Connection *Upgrade*
+        header Upgrade websocket
+    }
+    reverse_proxy @websockets backend:8000
+    
+    # Allow large uploads for images
+    request_body {
+        max_size 50MB
+    }
+}
+
+# Gemini Proxy (for Agentic Godot clients)
+gemini.zerograft.online {
+    reverse_proxy gemini-proxy:8001
+    
+    # Rate limiting at proxy level
+    rate_limit {
+        zone gemini {
+            key {remote_host}
+            events 100
+            window 1h
+        }
+    }
+}
+
+# AI Router (for Agentic Godot editor)
+ai.zerograft.online {
+    # HTTP API endpoint
+    reverse_proxy /chat ai-router:9877
+    reverse_proxy /health ai-router:9877
+    
+    # WebSocket endpoint
+    @websockets {
+        header Connection *Upgrade*
+        header Upgrade websocket
+    }
+    reverse_proxy @websockets ai-router:9878
+    
+    # Default to HTTP API
+    reverse_proxy ai-router:9877
+}
+
+# Optional: Static downloads for Godot binary
+# downloads.zerograft.online {
+#     root * /var/www/downloads
+#     file_server
+# }

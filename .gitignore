@@ -1,0 +1,85 @@
+# ========================
+# OS & IDE
+# ========================
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*.bak
+*.tmp
+.vscode/
+.idea/
+
+# ========================
+# Environment & Secrets
+# ========================
+.env
+.env.local
+.env.production
+.env.*.local
+
+# ========================
+# Python
+# ========================
+__pycache__/
+*.py[cod]
+*.egg-info/
+*.egg
+dist/
+build/
+venv/
+.venv/
+*.whl
+.pytest_cache/
+
+# ========================
+# Node.js / Next.js
+# ========================
+node_modules/
+.next/
+out/
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+tsconfig.tsbuildinfo
+
+# ========================
+# Godot Engine Source & Build (large binaries)
+# ========================
+Spritmaker-2/godot/src/agentic-godot/godot-engine/
+Spritmaker-2/godot/src/agentic-godot/gdcef/
+# ZeroGraft AI Router (include source, exclude build artifacts)
+Spritmaker-2/godot/src/zerograft-ai/src/mcp-servers/godot/node_modules/
+Spritmaker-2/godot/src/zerograft-ai/src/mcp-servers/godot/dist/
+Spritmaker-2/godot/src/zerograft-ai/src/mcp-servers/godot/ai-router-macos
+Spritmaker-2/godot/src/zerograft-ai/src/mcp-servers/godot/bin/
+Spritmaker-2/godot/src/zerograft-ai/src/mcp-servers/spritemancer/node_modules/
+Spritmaker-2/godot/src/zerograft-ai/src/core/
+Spritmaker-2/godot/src/zerograft-ai/src/webview/
+Spritmaker-2/godot/build/
+Spritmaker-2/godot/archives/
+
+# ========================
+# Godot Editor Cache & Compiled Objects
+# ========================
+.godot/
+*.o
+*.import
+
+# ========================
+# Logs
+# ========================
+*.log
+logs/
+
+# ========================
+# Deploy artifacts (kept locally)
+# ========================
+deploy/ai-router/dist/

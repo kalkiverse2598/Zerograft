@@ -1,0 +1,250 @@
+{
+    "version": "1.0",
+    "godot_version": "4.x",
+    "topics": {
+        "CharacterBody2D": {
+            "description": "Specialized physics body for user-controlled characters. Not affected by physics but affects other physics bodies.",
+            "inherits": "PhysicsBody2D < CollisionObject2D < Node2D",
+            "properties": {
+                "velocity": {
+                    "type": "Vector2",
+                    "default": "(0, 0)",
+                    "description": "Movement velocity vector"
+                },
+                "floor_max_angle": {
+                    "type": "float",
+                    "default": "0.785 (~45°)",
+                    "description": "Maximum slope angle for floor detection"
+                },
+                "floor_snap_length": {
+                    "type": "float",
+                    "default": "1.0",
+                    "description": "Snapping distance to floor"
+                },
+                "motion_mode": {
+                    "type": "MotionMode",
+                    "values": [
+                        "GROUNDED",
+                        "FLOATING"
+                    ],
+                    "description": "Movement mode"
+                },
+                "up_direction": {
+                    "type": "Vector2",
+                    "default": "(0, -1)",
+                    "description": "Direction considered as up"
+                }
+            },
+            "methods": {
+                "move_and_slide": {
+                    "returns": "bool",
+                    "description": "Move body using velocity, handles collisions/sliding"
+                },
+                "is_on_floor": {
+                    "returns": "bool",
+                    "description": "True if touching floor"
+                },
+                "is_on_wall": {
+                    "returns": "bool",
+                    "description": "True if touching wall"
+                },
+                "is_on_ceiling": {
+                    "returns": "bool",
+                    "description": "True if touching ceiling"
+                },
+                "get_floor_normal": {
+                    "returns": "Vector2",
+                    "description": "Normal of floor surface"
+                }
+            },
+            "code_example": "extends CharacterBody2D\n\n@export var speed: float = 300.0\n@export var jump_velocity: float = -400.0\n\nfunc _physics_process(delta: float) -> void:\n    if not is_on_floor():\n        velocity += get_gravity() * delta\n    \n    if Input.is_action_just_pressed(\"jump\") and is_on_floor():\n        velocity.y = jump_velocity\n    \n    var direction := Input.get_axis(\"move_left\", \"move_right\")\n    velocity.x = direction * speed\n    \n    move_and_slide()"
+        },
+        "AnimatedSprite2D": {
+            "description": "Sprite node containing multiple textures as animation frames. Uses SpriteFrames resource.",
+            "inherits": "Node2D < CanvasItem < Node",
+            "properties": {
+                "sprite_frames": {
+                    "type": "SpriteFrames",
+                    "description": "Resource containing animations"
+                },
+                "animation": {
+                    "type": "StringName",
+                    "default": "\"default\"",
+                    "description": "Current animation name"
+                },
+                "autoplay": {
+                    "type": "String",
+                    "description": "Animation to play on ready"
+                },
+                "frame": {
+                    "type": "int",
+                    "default": "0",
+                    "description": "Current frame index"
+                },
+                "flip_h": {
+                    "type": "bool",
+                    "default": "false",
+                    "description": "Flip sprite horizontally"
+                },
+                "flip_v": {
+                    "type": "bool",
+                    "default": "false",
+                    "description": "Flip sprite vertically"
+                },
+                "speed_scale": {
+                    "type": "float",
+                    "default": "1.0",
+                    "description": "Animation speed multiplier"
+                }
+            },
+            "methods": {
+                "play": {
+                    "params": "anim: StringName, custom_speed: float = 1.0",
+                    "description": "Play animation"
+                },
+                "pause": {
+                    "description": "Pause animation"
+                },
+                "stop": {
+                    "description": "Stop animation and reset frame"
+                },
+                "is_playing": {
+                    "returns": "bool",
+                    "description": "Check if playing"
+                }
+            },
+            "signals": {
+                "animation_finished": "Emitted when non-looping animation ends",
+                "animation_changed": "Emitted when animation changes",
+                "animation_looped": "Emitted when looping animation completes a cycle",
+                "frame_changed": "Emitted when frame changes"
+            },
+            "code_example": "@onready var sprite: AnimatedSprite2D = $AnimatedSprite2D\n\nfunc _physics_process(delta: float) -> void:\n    if velocity.x < 0:\n        sprite.flip_h = true\n    elif velocity.x > 0:\n        sprite.flip_h = false\n    \n    if not is_on_floor():\n        sprite.play(\"jump\")\n    elif velocity.x != 0:\n        sprite.play(\"run\")\n    else:\n        sprite.play(\"idle\")"
+        },
+        "SpriteFrames": {
+            "description": "Resource containing animation frames for AnimatedSprite2D. Manages named animations with frames, FPS, and loop settings.",
+            "inherits": "Resource",
+            "methods": {
+                "add_animation": {
+                    "params": "anim: StringName",
+                    "description": "Create new animation"
+                },
+                "remove_animation": {
+                    "params": "anim: StringName",
+                    "description": "Delete animation"
+                },
+                "has_animation": {
+                    "params": "anim: StringName",
+                    "returns": "bool",
+                    "description": "Check if animation exists"
+                },
+                "get_animation_names": {
+                    "returns": "PackedStringArray",
+                    "description": "List all animation names"
+                },
+                "add_frame": {
+                    "params": "anim: StringName, texture: Texture2D, duration: float = 1.0, at_position: int = -1",
+                    "description": "Add frame to animation"
+                },
+                "get_frame_count": {
+                    "params": "anim: StringName",
+                    "returns": "int",
+                    "description": "Get frame count"
+                },
+                "set_animation_loop": {
+                    "params": "anim: StringName, loop: bool",
+                    "description": "Set loop property"
+                },
+                "set_animation_speed": {
+                    "params": "anim: StringName, fps: float",
+                    "description": "Set animation FPS"
+                }
+            },
+            "code_example": "var sprite_frames := SpriteFrames.new()\n\nsprite_frames.add_animation(\"idle\")\nsprite_frames.set_animation_speed(\"idle\", 8.0)\nsprite_frames.set_animation_loop(\"idle\", true)\n\nvar texture := preload(\"res://sprites/idle_frame1.png\")\nsprite_frames.add_frame(\"idle\", texture, 1.0)\n\n$AnimatedSprite2D.sprite_frames = sprite_frames"
+        },
+        "@onready": {
+            "category": "annotation",
+            "description": "Defers variable initialization until _ready() is called. Useful for node references.",
+            "syntax": "@onready var my_var = $NodePath",
+            "warnings": [
+                "Never combine @onready + @export on same variable - @onready will override export value"
+            ],
+            "code_example": "@onready var sprite: AnimatedSprite2D = $AnimatedSprite2D\n@onready var collision: CollisionShape2D = $CollisionShape2D"
+        },
+        "@export": {
+            "category": "annotation",
+            "description": "Exposes variable in the Godot Inspector panel. Value is saved with scene.",
+            "syntax": "@export var speed: float = 300.0",
+            "variants": {
+                "@export_range": "Slider with min/max: @export_range(0, 100) var health: int",
+                "@export_group": "Creates collapsible group: @export_group(\"Combat\")",
+                "@export_category": "Creates new category: @export_category(\"Player\")",
+                "@export_enum": "Dropdown: @export_enum(\"Easy\", \"Medium\", \"Hard\") var difficulty: int"
+            },
+            "code_example": "@export var speed: float = 300.0\n@export var jump_height: float = 400.0\n@export var player_texture: Texture2D\n\n@export_group(\"Combat\")\n@export var damage: int = 10\n@export_range(0, 100, 1) var health: int = 100"
+        },
+        "signals": {
+            "category": "concept",
+            "description": "Godot's observer pattern for loosely-coupled node communication.",
+            "declaration": "signal my_signal(param: Type)",
+            "emit": "my_signal.emit(value)",
+            "connect": "other_node.my_signal.connect(_handler)",
+            "disconnect": "other_node.my_signal.disconnect(_handler)",
+            "code_example": "signal health_changed(new_value: int)\nsignal died\n\nfunc take_damage(amount: int) -> void:\n    health -= amount\n    health_changed.emit(health)\n    if health <= 0:\n        died.emit()\n\n# Connecting:\nfunc _ready() -> void:\n    $Enemy.died.connect(_on_enemy_died)\n\nfunc _on_enemy_died() -> void:\n    score += 100"
+        },
+        "preload": {
+            "category": "function",
+            "description": "Compile-time resource loading. Loads at parse time, must use constant path string.",
+            "syntax": "const Scene = preload(\"res://scene.tscn\")",
+            "use_when": "Resources always needed, frequently used assets, constants",
+            "code_example": "const EnemyScene := preload(\"res://scenes/enemy.tscn\")\nconst PlayerSprite := preload(\"res://sprites/player.png\")\n\nfunc spawn_enemy() -> void:\n    var enemy := EnemyScene.instantiate()\n    add_child(enemy)"
+        },
+        "load": {
+            "category": "function",
+            "description": "Runtime resource loading. Loads when line executes, can use dynamic paths.",
+            "syntax": "var scene = load(path_variable)",
+            "use_when": "Dynamic paths, conditionally loaded resources",
+            "code_example": "func load_level(level_name: String) -> void:\n    var path := \"res://levels/%s.tscn\" % level_name\n    var scene := load(path) as PackedScene\n    get_tree().change_scene_to_packed(scene)"
+        },
+        "get_node": {
+            "category": "method",
+            "description": "Gets node reference by path. $ is shorthand.",
+            "syntax": {
+                "direct_child": "$ChildNode or get_node(\"ChildNode\")",
+                "nested": "$Parent/Child",
+                "parent": "get_parent()",
+                "unique_name": "%UniqueNode",
+                "root": "get_tree().root"
+            },
+            "best_practice": "Use @export var node: NodeType for external node references",
+            "code_example": "var player = $Player\nvar sprite = $Player/AnimatedSprite2D\nvar parent = get_parent()\nvar root = get_tree().root"
+        },
+        "move_and_slide": {
+            "category": "method",
+            "class": "CharacterBody2D",
+            "description": "Moves body using velocity property. Handles collisions and sliding automatically.",
+            "returns": "bool (true if any collision occurred)",
+            "notes": [
+                "Do NOT multiply velocity by delta - method handles timing internally",
+                "After calling, check is_on_floor(), is_on_wall(), is_on_ceiling()",
+                "Uses the velocity property directly"
+            ],
+            "code_example": "func _physics_process(delta: float) -> void:\n    velocity.x = direction * speed\n    if not is_on_floor():\n        velocity += get_gravity() * delta\n    move_and_slide()"
+        },
+        "node_hierarchy": {
+            "category": "pattern",
+            "description": "Common 2D player character node structure",
+            "structure": "CharacterBody2D (Player)\n├── AnimatedSprite2D\n├── CollisionShape2D\n├── Camera2D\n└── Hurtbox (Area2D)\n    └── CollisionShape2D",
+            "code_example": "extends CharacterBody2D\nclass_name Player\n\n@export var speed: float = 300.0\n@onready var sprite: AnimatedSprite2D = $AnimatedSprite2D\n@onready var collision: CollisionShape2D = $CollisionShape2D\n\nsignal died"
+        }
+    },
+    "common_mistakes": [
+        "Using node TYPE instead of NAME in paths (\"CharacterBody2D\" vs \"Player\")",
+        "Combining @onready + @export on same variable",
+        "Multiplying velocity by delta before move_and_slide()",
+        "Using old Godot 3 signal syntax (strings instead of Callable)",
+        "Calling load() in _process - use preload for constants",
+        "Calling queue_free() forgetting about memory leaks",
+        "Wrong node path - use $ for children, not types"
+    ]
+}

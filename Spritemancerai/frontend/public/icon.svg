@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <!-- Magical gradient -->
+        <linearGradient id="magic-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#8B5CF6"/>
+            <stop offset="50%" stop-color="#EC4899"/>
+            <stop offset="100%" stop-color="#06B6D4"/>
+        </linearGradient>
+        
+        <!-- Cyan glow -->
+        <linearGradient id="cyan-glow" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#22D3EE"/>
+            <stop offset="100%" stop-color="#0EA5E9"/>
+        </linearGradient>
+        
+        <!-- Purple magic -->
+        <linearGradient id="purple-magic" x1="0%" y1="100%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#A855F7"/>
+            <stop offset="100%" stop-color="#6366F1"/>
+        </linearGradient>
+        
+        <!-- Glow filter -->
+        <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="2" result="blur"/>
+            <feMerge>
+                <feMergeNode in="blur"/>
+                <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+        </filter>
+        
+        <!-- Sparkle filter -->
+        <filter id="sparkle-glow" x="-100%" y="-100%" width="300%" height="300%">
+            <feGaussianBlur stdDeviation="1.5" result="blur"/>
+            <feMerge>
+                <feMergeNode in="blur"/>
+                <feMergeNode in="blur"/>
+                <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+        </filter>
+    </defs>
+
+    <!-- No background - transparent -->
+
+    <!-- Magic wand body -->
+    <g filter="url(#glow)">
+        <!-- Wand stick -->
+        <rect x="12" y="28" width="32" height="6" rx="2" fill="url(#purple-magic)" transform="rotate(-35 28 31)">
+            <animate attributeName="opacity" values="0.9;1;0.9" dur="2s" repeatCount="indefinite"/>
+        </rect>
+        
+        <!-- Wand handle accent -->
+        <rect x="8" y="38" width="12" height="4" rx="1" fill="#4C1D95" transform="rotate(-35 14 40)"/>
+        
+        <!-- Crystal tip -->
+        <polygon points="44,12 48,20 44,18 40,20" fill="url(#cyan-glow)" filter="url(#sparkle-glow)">
+            <animate attributeName="opacity" values="0.8;1;0.8" dur="1.5s" repeatCount="indefinite"/>
+        </polygon>
+    </g>
+
+    <!-- Magical sparkles orbiting the wand tip -->
+    <g filter="url(#sparkle-glow)">
+        <!-- Sparkle 1 - orbiting -->
+        <circle r="2" fill="#22D3EE">
+            <animateMotion dur="3s" repeatCount="indefinite">
+                <mpath href="#orbit1"/>
+            </animateMotion>
+            <animate attributeName="opacity" values="0;1;1;0" dur="3s" repeatCount="indefinite"/>
+        </circle>
+        <path id="orbit1" d="M44,14 Q54,8 50,18 Q46,28 36,22 Q26,16 44,14" fill="none"/>
+        
+        <!-- Sparkle 2 -->
+        <circle r="1.5" fill="#A855F7">
+            <animateMotion dur="2.5s" repeatCount="indefinite" begin="0.5s">
+                <mpath href="#orbit2"/>
+            </animateMotion>
+            <animate attributeName="opacity" values="0;1;1;0" dur="2.5s" repeatCount="indefinite" begin="0.5s"/>
+        </circle>
+        <path id="orbit2" d="M44,14 Q58,14 52,24 Q46,34 40,28 Q34,22 44,14" fill="none"/>
+        
+        <!-- Sparkle 3 -->
+        <circle r="1" fill="#EC4899">
+            <animateMotion dur="2s" repeatCount="indefinite" begin="1s">
+                <mpath href="#orbit3"/>
+            </animateMotion>
+            <animate attributeName="opacity" values="0;1;1;0" dur="2s" repeatCount="indefinite" begin="1s"/>
+        </circle>
+        <path id="orbit3" d="M44,14 Q50,4 48,16 Q46,28 42,20 Q38,12 44,14" fill="none"/>
+    </g>
+
+    <!-- Static sparkle stars -->
+    <g fill="#FFF" filter="url(#sparkle-glow)">
+        <!-- Star 1 -->
+        <polygon points="52,8 53,10 55,10 53.5,11.5 54,14 52,12.5 50,14 50.5,11.5 49,10 51,10">
+            <animate attributeName="opacity" values="0.3;1;0.3" dur="1.2s" repeatCount="indefinite"/>
+            <animate attributeName="transform" values="scale(1);scale(1.2);scale(1)" dur="1.2s" repeatCount="indefinite" additive="sum"/>
+        </polygon>
+        
+        <!-- Star 2 -->
+        <polygon points="38,6 39,8 41,8 39.5,9.5 40,12 38,10.5 36,12 36.5,9.5 35,8 37,8">
+            <animate attributeName="opacity" values="0.5;1;0.5" dur="1.5s" repeatCount="indefinite" begin="0.3s"/>
+            <animate attributeName="transform" values="scale(1);scale(1.3);scale(1)" dur="1.5s" repeatCount="indefinite" begin="0.3s" additive="sum"/>
+        </polygon>
+        
+        <!-- Star 3 -->
+        <polygon points="56,20 57,22 59,22 57.5,23.5 58,26 56,24.5 54,26 54.5,23.5 53,22 55,22">
+            <animate attributeName="opacity" values="0.4;1;0.4" dur="1.8s" repeatCount="indefinite" begin="0.6s"/>
+            <animate attributeName="transform" values="scale(1);scale(1.15);scale(1)" dur="1.8s" repeatCount="indefinite" begin="0.6s" additive="sum"/>
+        </polygon>
+    </g>
+
+    <!-- Pixel "S" hint - subtle nod to SpriteMancer -->
+    <g opacity="0.6">
+        <rect x="6" y="50" width="3" height="3" fill="#22D3EE">
+            <animate attributeName="opacity" values="0.4;0.8;0.4" dur="2s" repeatCount="indefinite"/>
+        </rect>
+        <rect x="9" y="47" width="3" height="3" fill="#22D3EE">
+            <animate attributeName="opacity" values="0.4;0.8;0.4" dur="2s" repeatCount="indefinite" begin="0.2s"/>
+        </rect>
+        <rect x="6" y="44" width="3" height="3" fill="#22D3EE">
+            <animate attributeName="opacity" values="0.4;0.8;0.4" dur="2s" repeatCount="indefinite" begin="0.4s"/>
+        </rect>
+    </g>
+
+    <!-- Trailing magic dust -->
+    <g fill="url(#magic-grad)" opacity="0.6">
+        <circle cx="18" cy="42" r="1.5">
+            <animate attributeName="opacity" values="0.2;0.6;0.2" dur="2.5s" repeatCount="indefinite"/>
+        </circle>
+        <circle cx="22" cy="38" r="1">
+            <animate attributeName="opacity" values="0.3;0.7;0.3" dur="2s" repeatCount="indefinite" begin="0.3s"/>
+        </circle>
+        <circle cx="26" cy="34" r="0.8">
+            <animate attributeName="opacity" values="0.4;0.8;0.4" dur="1.8s" repeatCount="indefinite" begin="0.5s"/>
+        </circle>
+    </g>
+</svg>

@@ -1,0 +1,44 @@
+[project]
+name = "spritemancer-backend"
+version = "0.1.0"
+description = "SpriteMancer AI - Backend API for 2D sprite generation"
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+    "fastapi>=0.115.0",
+    "uvicorn[standard]>=0.32.0",
+    "websockets>=13.0",
+    "redis>=5.0.0",
+    "python-multipart>=0.0.9",
+    "pillow>=10.0.0",
+    "opencv-python>=4.9.0",
+    "numpy>=1.26.0",
+    "httpx>=0.27.0",
+    "pydantic>=2.9.0",
+    "pydantic-settings>=2.5.0",
+    "supabase>=2.10.0",
+    "google-genai>=1.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.24.0",
+    "mypy>=1.11.0",
+    "ruff>=0.6.0",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py39"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP"]
+
+[tool.mypy]
+python_version = "3.9"
+strict = true
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]

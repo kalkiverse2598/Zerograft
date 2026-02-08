@@ -1,0 +1,2 @@
+Spritmaker-2/godot/src/agentic-godot/project/cef_artifacts/** filter=lfs diff=lfs merge=lfs -text
+Spritmaker-2/godot/src/agentic-godot/project/cef_artifacts/cefsimple.app/Contents/Frameworks/Chromium[[:space:]]Embedded[[:space:]]Framework.framework/Versions/A/Chromium[[:space:]]Embedded[[:space:]]Framework filter=lfs diff=lfs merge=lfs -text
