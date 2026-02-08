@@ -51,10 +51,10 @@ yarn-error.log*
 tsconfig.tsbuildinfo
 
 # ========================
-# Godot Engine Source & Build (large binaries)
+# Godot Engine Build Artifacts (source included as submodules)
 # ========================
-Spritmaker-2/godot/src/agentic-godot/godot-engine/
-Spritmaker-2/godot/src/agentic-godot/gdcef/
+Spritmaker-2/godot/src/agentic-godot/godot-engine/bin/
+Spritmaker-2/godot/src/agentic-godot/gdcef/addons/gdcef/thirdparty/
 # ZeroGraft AI Router (include source, exclude build artifacts)
 Spritmaker-2/godot/src/zerograft-ai/src/mcp-servers/godot/node_modules/
 Spritmaker-2/godot/src/zerograft-ai/src/mcp-servers/godot/dist/

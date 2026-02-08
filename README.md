@@ -29,6 +29,41 @@ A **multi-agent orchestrator** coordinates Character, Level, Architecture, and Q
 
 ---
 
+## Quick Start (Clone → Run)
+
+```bash
+# 1. Clone with submodules (includes Godot 4.3 source + gdCEF)
+git clone --recurse-submodules https://github.com/kalkiverse2598/Zerograft.git
+cd Zerograft
+
+# 2. One-command setup (builds Godot, installs dependencies)
+./setup.sh
+```
+
+After setup, run in separate terminals:
+
+```bash
+# Terminal 1: Godot Editor
+cd Spritmaker-2/godot/src/agentic-godot/godot-engine
+./bin/godot.macos.editor.arm64 --editor --path ../project
+
+# Terminal 2: AI Router
+cd Spritmaker-2/godot/src/zerograft-ai/src/mcp-servers/godot
+npm run dev
+
+# Terminal 3: SpriteMancer Backend
+cd Spritemancerai/backend
+uvicorn main:app --reload --port 8000
+
+# Terminal 4: SpriteMancer Frontend
+cd Spritemancerai/frontend
+npm run dev
+```
+
+> **Note:** Set your `GEMINI_API_KEY` in `Spritmaker-2/godot/src/zerograft-ai/src/mcp-servers/godot/.env` before running.
+
+---
+
 ## Architecture
 
 ```
