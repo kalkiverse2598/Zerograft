@@ -32,11 +32,10 @@ Spritmaker-2/godot/
 
 ### Prerequisites
 
-The Godot 4.3 engine source (~1.7GB) is not included in this repo. Clone it first:
+Godot 4.3 source and gdCEF are included as **git submodules**. Make sure you cloned with:
 
 ```bash
-cd src/agentic-godot
-git clone --branch 4.3-stable --depth 1 https://github.com/godotengine/godot.git godot-engine
+git clone --recurse-submodules https://github.com/kalkiverse2598/Zerograft.git
 ```
 
 You also need [scons](https://scons.org/) and standard C++ build tools. See [Godot build docs](https://docs.godotengine.org/en/stable/contributing/development/compiling/index.html).
@@ -47,7 +46,7 @@ You also need [scons](https://scons.org/) and standard C++ build tools. See [God
 cd src/agentic-godot
 ./build_godot.sh    # Symlinks custom modules + builds
 cd godot-engine
-./bin/godot.macos.editor.arm64 --editor
+./bin/godot.macos.editor.arm64 --editor --path ../project
 ```
 
 ### 2. Build and Run AI Router

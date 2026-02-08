@@ -1,0 +1,8 @@
+[submodule "Spritmaker-2/godot/src/agentic-godot/godot-engine"]
+	path = Spritmaker-2/godot/src/agentic-godot/godot-engine
+	url = https://github.com/godotengine/godot.git
+	branch = 4.3-stable
+[submodule "Spritmaker-2/godot/src/agentic-godot/gdcef"]
+	path = Spritmaker-2/godot/src/agentic-godot/gdcef
+	url = https://github.com/Lecrapouille/gdcef.git
+	branch = godot-4.x
