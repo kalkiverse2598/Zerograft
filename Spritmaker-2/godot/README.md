@@ -30,11 +30,22 @@ Spritmaker-2/godot/
 
 ## Quick Start
 
+### Prerequisites
+
+The Godot 4.3 engine source (~1.7GB) is not included in this repo. Clone it first:
+
+```bash
+cd src/agentic-godot
+git clone --branch 4.3-stable --depth 1 https://github.com/godotengine/godot.git godot-engine
+```
+
+You also need [scons](https://scons.org/) and standard C++ build tools. See [Godot build docs](https://docs.godotengine.org/en/stable/contributing/development/compiling/index.html).
+
 ### 1. Build and Run Godot Fork
 
 ```bash
 cd src/agentic-godot
-./build_godot.sh
+./build_godot.sh    # Symlinks custom modules + builds
 cd godot-engine
 ./bin/godot.macos.editor.arm64 --editor
 ```
