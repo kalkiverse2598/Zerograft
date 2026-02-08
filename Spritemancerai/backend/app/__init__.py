@@ -1,0 +1,1 @@
+"""SpriteMancer AI Backend Application."""

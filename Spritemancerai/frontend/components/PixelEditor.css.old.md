@@ -1,0 +1,461 @@
+/* ========================================
+   Epic Pixel Editor - Custom Styles
+   Glassmorphism + Neon Accents
+======================================== */
+
+/* CSS Variables for theming */
+:root {
+  --pe-bg-deep: #0a0a0f;
+  --pe-bg-panel: rgba(15, 15, 25, 0.85);
+  --pe-bg-button: rgba(30, 30, 45, 0.8);
+  --pe-bg-button-hover: rgba(45, 45, 70, 0.9);
+  --pe-accent: #8b5cf6;
+  --pe-accent-glow: rgba(139, 92, 246, 0.4);
+  --pe-accent-bright: #a78bfa;
+  --pe-border: rgba(139, 92, 246, 0.2);
+  --pe-border-bright: rgba(139, 92, 246, 0.5);
+  --pe-text: #e4e4e7;
+  --pe-text-muted: #71717a;
+}
+
+/* Glassmorphism Panel */
+.pe-glass-panel {
+  background: var(--pe-bg-panel);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--pe-border);
+  box-shadow: 
+    0 4px 30px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+/* Header with gradient glow */
+.pe-header {
+  background: linear-gradient(
+    135deg,
+    rgba(15, 15, 25, 0.95) 0%,
+    rgba(25, 20, 45, 0.95) 50%,
+    rgba(15, 15, 25, 0.95) 100%
+  );
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--pe-border);
+  box-shadow: 
+    0 2px 20px rgba(139, 92, 246, 0.15),
+    inset 0 -1px 0 rgba(139, 92, 246, 0.1);
+}
+
+/* Animated title */
+.pe-title {
+  background: linear-gradient(
+    90deg,
+    #a78bfa 0%,
+    #c4b5fd 25%,
+    #8b5cf6 50%,
+    #c4b5fd 75%,
+    #a78bfa 100%
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: pe-shimmer 3s linear infinite;
+  text-shadow: 0 0 30px rgba(139, 92, 246, 0.3);
+}
+
+@keyframes pe-shimmer {
+  0% { background-position: 0% center; }
+  100% { background-position: 200% center; }
+}
+
+/* Tool Button Base */
+.pe-tool-btn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: var(--pe-bg-button);
+  border: 1px solid transparent;
+  color: var(--pe-text-muted);
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.pe-tool-btn:hover {
+  background: var(--pe-bg-button-hover);
+  border-color: var(--pe-border);
+  color: var(--pe-text);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.pe-tool-btn.active {
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.3) 0%, rgba(139, 92, 246, 0.1) 100%);
+  border-color: var(--pe-accent);
+  color: var(--pe-accent-bright);
+  box-shadow: 
+    0 0 15px var(--pe-accent-glow),
+    inset 0 0 15px rgba(139, 92, 246, 0.1);
+}
+
+.pe-tool-btn.active::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--pe-accent), transparent);
+  opacity: 0.3;
+  z-index: -1;
+  filter: blur(4px);
+}
+
+/* Small tool button variant */
+.pe-tool-btn-sm {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+}
+
+/* Sidebar */
+.pe-sidebar {
+  background: var(--pe-bg-panel);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-right: 1px solid var(--pe-border);
+  box-shadow: 2px 0 20px rgba(0, 0, 0, 0.2);
+}
+
+/* Toolbar */
+.pe-toolbar {
+  background: linear-gradient(
+    180deg,
+    rgba(20, 20, 30, 0.9) 0%,
+    rgba(15, 15, 25, 0.85) 100%
+  );
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--pe-border);
+}
+
+/* Divider */
+.pe-divider {
+  width: 1px;
+  height: 24px;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    var(--pe-border-bright) 50%,
+    transparent 100%
+  );
+}
+
+/* Color Swatch */
+.pe-color-swatch {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.pe-color-swatch:hover {
+  transform: scale(1.15);
+  border-color: var(--pe-accent);
+  box-shadow: 0 0 10px var(--pe-accent-glow);
+}
+
+/* Main Color Picker */
+.pe-color-picker {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  border: 2px solid var(--pe-border-bright);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.pe-color-picker:hover {
+  border-color: var(--pe-accent);
+  box-shadow: 0 0 15px var(--pe-accent-glow);
+}
+
+/* Select / Dropdown */
+.pe-select {
+  background: var(--pe-bg-button);
+  border: 1px solid var(--pe-border);
+  border-radius: 8px;
+  color: var(--pe-text);
+  padding: 6px 12px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.pe-select:hover {
+  border-color: var(--pe-border-bright);
+  background: var(--pe-bg-button-hover);
+}
+
+.pe-select:focus {
+  outline: none;
+  border-color: var(--pe-accent);
+  box-shadow: 0 0 0 2px var(--pe-accent-glow);
+}
+
+/* Input Number */
+.pe-input {
+  background: var(--pe-bg-button);
+  border: 1px solid var(--pe-border);
+  border-radius: 8px;
+  color: var(--pe-text);
+  padding: 6px 10px;
+  font-size: 13px;
+  text-align: center;
+  width: 50px;
+  transition: all 0.2s ease;
+}
+
+.pe-input:hover {
+  border-color: var(--pe-border-bright);
+}
+
+.pe-input:focus {
+  outline: none;
+  border-color: var(--pe-accent);
+  box-shadow: 0 0 0 2px var(--pe-accent-glow);
+}
+
+/* Zoom Slider */
+.pe-zoom-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100px;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--pe-bg-button);
+  outline: none;
+  cursor: pointer;
+}
+
+.pe-zoom-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--pe-accent);
+  cursor: pointer;
+  box-shadow: 0 0 10px var(--pe-accent-glow);
+  transition: all 0.15s ease;
+}
+
+.pe-zoom-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+  box-shadow: 0 0 15px var(--pe-accent);
+}
+
+.pe-zoom-slider::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--pe-accent);
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 0 10px var(--pe-accent-glow);
+}
+
+/* Action Button (Save, Cancel) */
+.pe-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+}
+
+.pe-btn-secondary {
+  background: var(--pe-bg-button);
+  color: var(--pe-text-muted);
+  border-color: var(--pe-border);
+}
+
+.pe-btn-secondary:hover {
+  background: var(--pe-bg-button-hover);
+  color: var(--pe-text);
+  border-color: var(--pe-border-bright);
+}
+
+.pe-btn-primary {
+  background: linear-gradient(135deg, #7c3aed 0%, #8b5cf6 100%);
+  color: white;
+  border-color: transparent;
+  box-shadow: 0 2px 10px rgba(139, 92, 246, 0.3);
+}
+
+.pe-btn-primary:hover {
+  background: linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%);
+  box-shadow: 0 4px 20px rgba(139, 92, 246, 0.5);
+  transform: translateY(-1px);
+}
+
+.pe-btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Footer / Status Bar */
+.pe-footer {
+  background: var(--pe-bg-panel);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-top: 1px solid var(--pe-border);
+}
+
+.pe-footer-text {
+  color: var(--pe-text-muted);
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pe-footer-highlight {
+  color: var(--pe-accent-bright);
+}
+
+/* Canvas Container */
+.pe-canvas-area {
+  background: var(--pe-bg-deep);
+  position: relative;
+}
+
+/* Scrollbar Styling */
+.pe-canvas-area::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.pe-canvas-area::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.pe-canvas-area::-webkit-scrollbar-thumb {
+  background: var(--pe-border-bright);
+  border-radius: 4px;
+}
+
+.pe-canvas-area::-webkit-scrollbar-thumb:hover {
+  background: var(--pe-accent);
+}
+
+/* Label text */
+.pe-label {
+  color: var(--pe-text-muted);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+/* Tool group section */
+.pe-tool-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-bottom: 12px;
+  margin-bottom: 12px;
+  border-bottom: 1px solid var(--pe-border);
+}
+
+.pe-tool-group:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+/* Marching ants animation for selection */
+@keyframes marching-ants {
+  0% { background-position: 0 0; }
+  100% { background-position: 16px 0; }
+}
+
+/* Pulse animation for active tools */
+@keyframes pe-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+/* ========================================
+   Advanced Features Panel
+======================================== */
+
+.pe-advanced-panel {
+  background: var(--pe-bg-panel);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.pe-panel-section {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.pe-panel-section:hover {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(139, 92, 246, 0.2);
+}
+
+.pe-checkbox {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--pe-accent);
+  cursor: pointer;
+}
+
+.pe-btn {
+  background: var(--pe-bg-button);
+  color: var(--pe-text);
+  border: 1px solid var(--pe-border);
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.pe-btn:hover {
+  background: var(--pe-bg-button-hover);
+  border-color: var(--pe-border-bright);
+  box-shadow: 0 0 12px var(--pe-accent-glow);
+}
+
+.pe-btn-sm {
+  padding: 6px 10px;
+  font-size: 11px;
+}
+
+/* Color swatch in panel */
+.pe-panel-swatch {
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.pe-panel-swatch:hover {
+  transform: scale(1.15);
+  border-color: var(--pe-accent);
+}

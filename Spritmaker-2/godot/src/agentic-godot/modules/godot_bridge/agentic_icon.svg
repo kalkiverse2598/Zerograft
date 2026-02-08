@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="32" height="32" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <linearGradient id="cyan-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#00ffff" />
+            <stop offset="100%" stop-color="#0088ff" />
+        </linearGradient>
+    </defs>
+
+    <rect width="100" height="100" fill="#1a1a1a" />
+
+    <!-- Row 1 -->
+    <rect x="40" y="15" width="5" height="5" fill="#d4d4d4"/>
+    <rect x="47" y="15" width="5" height="5" fill="#d4d4d4"/>
+    <rect x="54" y="15" width="5" height="5" fill="#d4d4d4"/>
+
+    <!-- Row 2 -->
+    <rect x="33" y="22" width="5" height="5" fill="#d4d4d4"/>
+    <rect x="40" y="22" width="5" height="5" fill="#d4d4d4"/>
+    <rect x="54" y="22" width="5" height="5" fill="#d4d4d4"/>
+    <rect x="61" y="22" width="5" height="5" fill="#d4d4d4"/>
+
+    <!-- Row 3 -->
+    <rect x="26" y="29" width="5" height="5" fill="#d4d4d4"/>
+    <rect x="33" y="29" width="5" height="5" fill="#d4d4d4"/>
+    <rect x="61" y="29" width="5" height="5" fill="#d4d4d4"/>
+    <rect x="68" y="29" width="5" height="5" fill="#d4d4d4"/>
+
+    <!-- Row 4 - Crossbar -->
+    <rect x="26" y="36" width="5" height="5" fill="#d4d4d4"/>
+    <rect x="33" y="36" width="5" height="5" fill="#d4d4d4"/>
+    <rect x="40" y="36" width="5" height="5" fill="#d4d4d4"/>
+    <rect x="47" y="36" width="5" height="5" fill="#d4d4d4"/>
+    <rect x="54" y="36" width="5" height="5" fill="#d4d4d4"/>
+    <rect x="61" y="36" width="5" height="5" fill="#d4d4d4"/>
+    <rect x="68" y="36" width="5" height="5" fill="#d4d4d4"/>
+
+    <!-- Row 5 -->
+    <rect x="26" y="43" width="5" height="5" fill="#d4d4d4"/>
+    <rect x="68" y="43" width="5" height="5" fill="#d4d4d4"/>
+
+    <!-- Row 6 -->
+    <rect x="26" y="50" width="5" height="5" fill="#d4d4d4"/>
+    <rect x="68" y="50" width="5" height="5" fill="#d4d4d4"/>
+
+    <!-- Row 7 -->
+    <rect x="26" y="57" width="5" height="5" fill="#d4d4d4"/>
+
+    <!-- Cyan pixel -->
+    <rect x="68" y="57" width="5" height="5" fill="url(#cyan-grad)"/>
+
+    <!-- Ambient glow -->
+    <ellipse cx="70.5" cy="59.5" rx="10" ry="10" fill="url(#cyan-grad)" opacity="0.15"/>
+</svg>
