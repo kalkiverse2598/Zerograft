@@ -1,0 +1,30 @@
+ZEROGRAFT PROPRIETARY LICENSE
+
+Copyright (c) 2024-2026 KalkiVerse / ZeroGraft. All Rights Reserved.
+
+NOTICE: This software and all associated documentation, including but not
+limited to the Agentic Godot integration, SpriteMancer AI pipeline, and
+multi-agent orchestration system, are proprietary and confidential.
+
+RESTRICTIONS:
+1. You may NOT copy, modify, merge, publish, distribute, sublicense, or sell
+   copies of this Software without explicit written permission from KalkiVerse.
+
+2. You may NOT use this Software for commercial purposes without a license
+   agreement from KalkiVerse.
+
+3. You may NOT reverse engineer, decompile, or disassemble the Software.
+
+PERMITTED USE:
+- Viewing the source code for evaluation purposes only
+- Building and running locally for personal, non-commercial evaluation
+- Providing feedback during the Gemini 3 Hackathon judging process
+
+THIRD-PARTY COMPONENTS:
+This project includes the Godot Engine, which is MIT licensed.
+Godot Engine Copyright (c) 2014-present Godot Engine contributors.
+See https://godotengine.org/license for Godot Engine license details.
+
+For licensing inquiries, contact: contact@zerograft.online
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
