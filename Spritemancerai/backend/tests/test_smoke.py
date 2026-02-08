@@ -20,7 +20,7 @@ def test_pipeline_orchestrator_imports():
 
 def test_models_import():
     """Verify Pydantic models import correctly."""
-    from app.models.pipeline import PipelineState
+    from app.models.pipeline_state import PipelineState
     assert PipelineState is not None
 
 
