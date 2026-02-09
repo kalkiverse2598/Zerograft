@@ -165,7 +165,7 @@ export class TaskPlanner {
 
         if (isGameCreation) {
             // Ensure we have all essential tasks for a game
-            const essentialTypes: AgentTaskType[] = ['create_scene', 'generate_character', 'create_script'];
+            const essentialTypes: AgentTaskType[] = ['create_scene', 'generate_character'];
 
             // Add platform/tileset for platformer games (with fuzzy matching for typos)
             const platformerPatterns = ['platformer', 'platform', 'plateformer', 'plataformer', 'platformar'];
@@ -174,6 +174,10 @@ export class TaskPlanner {
             if (isPlatformer) {
                 essentialTypes.push('generate_tileset');
             }
+
+            // Always add integrate_asset as the final assembly step for game creation
+            // This wires Player, AnimatedSprite2D, CollisionShape2D, Camera2D, and movement script
+            essentialTypes.push('integrate_asset');
 
             for (const type of essentialTypes) {
                 if (!detectedTypes.includes(type)) {
@@ -739,8 +743,9 @@ Analyze the user's request and break it into specific tasks.
 
 | Agent | Task Type | What It Does |
 |-------|-----------|-------------|
-| architecture | create_scene | Creates a new .tscn scene with root node, Camera2D, etc. |
+| architecture | create_scene | Creates a new .tscn scene with root node |
 | architecture | add_node | Adds nodes (CharacterBody2D, CollisionShape2D, etc.) to scenes |
+| architecture | integrate_asset | Wires everything into a playable game: Player hierarchy, sprites, collision, camera, movement script |
 | character | generate_character | Uses SpriteMancer AI to generate character sprites + animations |
 | character | create_script | Creates GDScript files (player controller, enemy AI, etc.) |
 | character | attach_script | Attaches an existing script to a node |
@@ -748,15 +753,14 @@ Analyze the user's request and break it into specific tasks.
 | qa | validate_project | Runs validation checks on the project |
 
 ## Rules
-- For "create a game" requests: ALWAYS include create_scene, generate_character, generate_tileset, and create_script
-- For platformer games: include generate_tileset for platforms/terrain
-- generate_character creates the visual sprites using AI (idle, walk, jump animations)
-- create_script creates the GDScript code (player movement, physics, etc.)
+- For "create a game" requests: ALWAYS include create_scene, generate_character, generate_tileset, and integrate_asset
+- integrate_asset is the FINAL assembly step — it creates the Player (CharacterBody2D) with AnimatedSprite2D, CollisionShape2D, Camera2D, assigns sprites, and creates+attaches a movement script
+- integrate_asset must run LAST, after generate_character and generate_tileset complete
+- Do NOT include create_script for player movement — integrate_asset handles that automatically
 - create_scene must come FIRST (other tasks depend on it)
 - generate_character and generate_tileset can run in PARALLEL after create_scene
-- create_script should run AFTER generate_character (needs to know the character setup)
 - If user mentions SpriteMancer, use generate_character and/or generate_tileset
-- Keep plans focused: 3-6 tasks for most requests
+- Keep plans focused: 3-5 tasks for most requests
 
 ## Current Project State
 - Scenes: ${existingScenes}

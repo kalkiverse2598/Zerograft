@@ -115,6 +115,34 @@ export class CharacterAgent extends BaseAgent {
             this.detectRequestedAnimations(taskContext);
         const style = (task.input.style as string) || 'pixel art';
 
+        // Step 0: Check for existing sprites before creating new ones
+        // This prevents wasteful re-generation when character assets already exist
+        try {
+            const existingFiles = await this.executeTool('list_files', { path: 'res://sprites', recursive: true });
+            if (existingFiles.success && existingFiles.data) {
+                const filesStr = JSON.stringify(existingFiles.data);
+                // Look for existing SpriteFrames resource (.tres) — indicates a fully generated character
+                const tresMatch = filesStr.match(/res:\/\/sprites\/[^"]*\.tres/);
+                if (tresMatch) {
+                    const existingSpriteFrames = tresMatch[0];
+                    this.callbacks.onProgress?.(`[Character] Found existing sprites: ${existingSpriteFrames}`);
+
+                    // Return early with existing asset info — no need to regenerate
+                    return this.createSuccessResult(task, [existingSpriteFrames], {
+                        characterName,
+                        existingSpriteFrames,
+                        animations: [],
+                        reused: true,
+                        status: 'reused_existing',
+                        message: `Reusing existing character sprites at ${existingSpriteFrames}. No new generation needed.`
+                    }, Date.now() - startTime);
+                }
+            }
+        } catch (e) {
+            // If listing fails, proceed with normal generation
+            this.callbacks.onProgress?.(`[Character] Could not check existing sprites, proceeding with generation`);
+        }
+
         this.callbacks.onProgress?.(`[Character] Creating ${characterName} with animations: ${animations.join(', ')}`);
 
         // Step 1: Create the character in SpriteMancer

@@ -383,9 +383,13 @@ export const AGENT_TOOL_ASSIGNMENTS = {
         'remove_node',
         'set_property',
         'reparent_node',
+        'set_collision_shape',
         // Integration (for post-character/tileset setup)
+        'create_script',
+        'attach_script',
         'connect_signal',
         'disconnect_signal',
+        'assets_scan',
         // Camera setup
         'get_scene_tree',
         'get_node_info'

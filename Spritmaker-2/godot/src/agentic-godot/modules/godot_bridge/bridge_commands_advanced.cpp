@@ -915,6 +915,14 @@ Dictionary GodotBridge::spritemancer_open_project(const String &p_project_id) {
 		print_line("[SpriteMancer Bridge] Calling load_project with: " + p_project_id);
 		// Then load the project (this will navigate the browser)
 		spritemancer->call("load_project", p_project_id);
+
+		// Auto-switch to SpriteMancer main screen tab so user can see the preview
+		EditorInterface *ei = EditorInterface::get_singleton();
+		if (ei) {
+			ei->set_main_screen_editor("Agentic Godot");
+			print_line("[SpriteMancer Bridge] Switched to Agentic Godot main screen");
+		}
+
 		result["project_id"] = p_project_id;
 		result["url"] = "https://spritemancer.zerograft.online/projects/" + p_project_id;
 		result["success"] = true;

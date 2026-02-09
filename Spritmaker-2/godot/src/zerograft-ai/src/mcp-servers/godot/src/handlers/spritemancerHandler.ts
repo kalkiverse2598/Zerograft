@@ -440,6 +440,18 @@ export class SpriteMancerHandler {
         }
 
         console.log(`[SpriteMancer] ✅ ${animation} complete!`);
+
+        // Auto-navigate browser to preview page and switch to SpriteMancer tab
+        // so the user can see the animation before the approval dialog
+        try {
+            await this.ctx.sendToGodot("spritemancer_open_project", { project_id: projectId });
+            // Navigate to the animation preview page within the project
+            await this.ctx.sendToGodot("spritemancer_navigate", { view: "preview" });
+            console.log(`[SpriteMancer] 👁️ Switched to preview for animation approval`);
+        } catch (e) {
+            console.log(`[SpriteMancer] ⚠️ Could not auto-switch to preview: ${e}`);
+        }
+
         const safeName = characterName.toLowerCase().replace(/[^a-z0-9]/g, "_").substring(0, 20);
 
         return {

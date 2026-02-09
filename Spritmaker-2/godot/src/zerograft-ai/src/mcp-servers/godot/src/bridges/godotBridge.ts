@@ -44,6 +44,9 @@ export class GodotBridge {
     private pendingRequests: Map<string, (result: unknown) => void> = new Map();
     private requestId = 0;
 
+    // TCP receive buffer for handling message framing
+    private receiveBuffer: string = '';
+
     // Scene change awaiter for async scene loading
     private sceneChangeResolver: ((scene: SceneContext) => void) | null = null;
 
@@ -83,24 +86,8 @@ export class GodotBridge {
             });
 
             this.socket.on("data", (data) => {
-                try {
-                    const response = JSON.parse(data.toString());
-
-                    // Handle events from GodotBridge
-                    if (response.type === "event") {
-                        this.handleEvent(response.event, response.data);
-                        return;
-                    }
-
-                    // Handle responses
-                    if (response.id && this.pendingRequests.has(response.id)) {
-                        const callback = this.pendingRequests.get(response.id)!;
-                        this.pendingRequests.delete(response.id);
-                        callback(response.result);
-                    }
-                } catch {
-                    // Ignore parse errors
-                }
+                this.receiveBuffer += data.toString();
+                this.processReceiveBuffer();
             });
 
             this.socket.on("error", (err) => {
@@ -190,7 +177,7 @@ export class GodotBridge {
 
         return new Promise((resolve, reject) => {
             this.pendingRequests.set(id, resolve);
-            this.socket!.write(message);
+            this.socket!.write(message + '\n');
 
             setTimeout(() => {
                 if (this.pendingRequests.has(id)) {
@@ -199,6 +186,85 @@ export class GodotBridge {
                 }
             }, timeoutMs);
         });
+    }
+
+    /**
+     * Process buffered TCP data, extracting complete JSON objects.
+     * Uses brace-depth counting to find object boundaries, handling
+     * concatenated messages (e.g., event + response in one TCP chunk).
+     */
+    private processReceiveBuffer(): void {
+        let startIdx = 0;
+
+        while (startIdx < this.receiveBuffer.length) {
+            // Skip whitespace/newlines between messages
+            while (startIdx < this.receiveBuffer.length &&
+                   '\n\r \t'.includes(this.receiveBuffer[startIdx])) {
+                startIdx++;
+            }
+            if (startIdx >= this.receiveBuffer.length) break;
+
+            // Expect a JSON object starting with '{'
+            if (this.receiveBuffer[startIdx] !== '{') {
+                startIdx++;
+                continue;
+            }
+
+            // Find the matching closing brace using depth counting
+            let depth = 0;
+            let endIdx = startIdx;
+            let inString = false;
+            let escaped = false;
+
+            for (; endIdx < this.receiveBuffer.length; endIdx++) {
+                const ch = this.receiveBuffer[endIdx];
+                if (escaped) { escaped = false; continue; }
+                if (ch === '\\') { escaped = true; continue; }
+                if (ch === '"') { inString = !inString; continue; }
+                if (inString) continue;
+                if (ch === '{') depth++;
+                if (ch === '}') {
+                    depth--;
+                    if (depth === 0) {
+                        endIdx++;
+                        break;
+                    }
+                }
+            }
+
+            if (depth === 0 && endIdx > startIdx) {
+                // Complete JSON object found
+                const jsonStr = this.receiveBuffer.substring(startIdx, endIdx);
+                try {
+                    const response = JSON.parse(jsonStr);
+                    this.handleParsedMessage(response);
+                } catch (e) {
+                    console.warn('[GodotBridge] Failed to parse JSON chunk:', (e as Error).message);
+                }
+                startIdx = endIdx;
+            } else {
+                // Incomplete object — keep remainder in buffer for next data event
+                break;
+            }
+        }
+
+        this.receiveBuffer = this.receiveBuffer.substring(startIdx);
+    }
+
+    /**
+     * Handle a single parsed message (event or response)
+     */
+    private handleParsedMessage(response: { type?: string; event?: string; data?: unknown; id?: string; result?: unknown }): void {
+        if (response.type === "event") {
+            this.handleEvent(response.event!, response.data);
+            return;
+        }
+
+        if (response.id && this.pendingRequests.has(response.id)) {
+            const callback = this.pendingRequests.get(response.id)!;
+            this.pendingRequests.delete(response.id);
+            callback(response.result);
+        }
     }
 
     /**

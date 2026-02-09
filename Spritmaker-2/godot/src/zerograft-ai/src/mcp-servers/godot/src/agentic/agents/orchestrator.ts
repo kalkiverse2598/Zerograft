@@ -229,32 +229,45 @@ export class Orchestrator extends BaseAgent {
         const normalized = userRequest.toLowerCase().trim();
 
         // Action words that clearly indicate task requests (not questions)
-        const actionWords = ['create', 'make', 'add', 'generate', 'build', 'design', 'implement', 'setup', 'configure', 'delete', 'remove'];
+        // Include common imperative verbs users say: "please fix", "do proper integration", "run the game", etc.
+        const actionWords = [
+            'create', 'make', 'add', 'generate', 'build', 'design', 'implement', 'setup', 'configure',
+            'delete', 'remove', 'fix', 'do', 'integrate', 'integration', 'run', 'test', 'use',
+            'move', 'place', 'put', 'attach', 'connect', 'set', 'update', 'change', 'modify',
+            'play', 'start', 'stop', 'enable', 'disable', 'install', 'save', 'load', 'open',
+            'close', 'rename', 'copy', 'paste', 'undo', 'redo', 'refactor', 'clean', 'organize',
+            'reparent', 'restructure', 'rewrite', 'replace', 'swap'
+        ];
+
+        const hasActionWord = actionWords.some(word => {
+            // Match whole word boundaries to avoid false positives (e.g. "do" in "document")
+            const regex = new RegExp(`\\b${word}\\b`);
+            return regex.test(normalized);
+        });
+
+        // If it has an action word, it's a task request — even if it also has question words
+        // e.g. "please check and do proper integration" has "check" AND "do" → action wins
+        if (hasActionWord) {
+            return false;
+        }
 
         // Info/status words that indicate the user wants information, not action
         const infoWords = ['status', 'current', 'progress', 'state', 'overview', 'summary', 'info', 'list', 'show', 'describe', 'report'];
         const hasInfoWord = infoWords.some(word => normalized.includes(word));
 
-        // If it has info words, it's conversational even if "provide" sounds like an action
         if (hasInfoWord) {
             return true;
         }
 
-        const hasActionWord = actionWords.some(word => normalized.includes(word));
-        if (hasActionWord) {
-            return false;  // This is a task request
-        }
-
-        // Question indicators
+        // Question indicators (only reached if NO action word was found)
         const isQuestion = normalized.includes('?');
         const questionPatterns = [
             'what', 'why', 'how', 'when', 'where', 'which', 'who',
             'have you', 'have u', 'did you', 'did u', 'do you', 'do u',
             'is it', 'are you', 'are there', 'can i', 'can u', 'can you',
-            'should i', 'tell me', 'explain', 'provide',
-            'show me', 'help me understand', 'what happened', 'whats wrong',
-            'check', 'checked', 'verify', 'look at', 'please provide',
-            'give me', 'let me know', 'update me', 'brief me'
+            'should i', 'tell me', 'explain',
+            'help me understand', 'what happened', 'whats wrong',
+            'let me know', 'brief me'
         ];
         const hasQuestionPattern = questionPatterns.some(pattern => normalized.includes(pattern));
 

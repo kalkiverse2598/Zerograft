@@ -14,6 +14,7 @@ class GodotBridge : public Node {
 private:
 	Ref<TCPServer> server;
 	Vector<Ref<StreamPeerTCP>> clients;
+	Vector<String> client_buffers;  // Per-client TCP receive buffers for message framing
 	CommandRegistry command_registry;
 	int port = 9876;
 	bool running = false;

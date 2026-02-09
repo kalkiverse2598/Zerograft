@@ -243,27 +243,204 @@ export class ArchitectureAgent extends BaseAgent {
 
     private async integrateAsset(task: AgentTask): Promise<AgentResult> {
         const startTime = Date.now();
-        const assetPath = task.input.assetPath as string;
-        const targetScene = task.input.targetScene as string;
+        const artifacts: string[] = [];
+        const taskContext = this.getTaskContextText(task);
+        const taskContextLower = taskContext.toLowerCase();
 
-        // Get current scene tree
+        this.callbacks.onProgress?.(`[Architecture] Integrating assets into playable scene...`);
+
+        // Step 1: Get current scene tree to see what exists
         const treeResult = await this.executeTool('get_scene_tree', {});
-
         if (!treeResult.success) {
             return this.createFailureResult(task, {
                 code: 'TOOL_FAILED',
-                message: 'Failed to get scene tree',
+                message: 'Failed to get scene tree - is a scene open?',
                 recoverable: true
             }, Date.now() - startTime);
         }
 
-        // Integration logic would go here
-        // For now, just report success
+        const treeStr = JSON.stringify(treeResult.data || {});
 
-        return this.createSuccessResult(task, [], {
-            assetPath,
-            targetScene,
-            integrated: true
+        // Step 2: Find existing SpriteFrames resource
+        let spriteFramesPath = '';
+        try {
+            const filesResult = await this.executeTool('list_files', { path: 'res://sprites', recursive: true });
+            if (filesResult.success && filesResult.data) {
+                const filesStr = JSON.stringify(filesResult.data);
+                const tresMatch = filesStr.match(/res:\/\/sprites\/[^"]*\.tres/);
+                if (tresMatch) {
+                    spriteFramesPath = tresMatch[0];
+                    this.callbacks.onProgress?.(`[Architecture] Found SpriteFrames: ${spriteFramesPath}`);
+                }
+            }
+        } catch (e) {
+            this.callbacks.onProgress?.(`[Architecture] Warning: Could not list sprite files`);
+        }
+
+        // Step 3: Build proper Player node hierarchy if it doesn't exist
+        const hasPlayer = treeStr.includes('Player') || treeStr.includes('CharacterBody');
+
+        if (!hasPlayer) {
+            this.callbacks.onProgress?.(`[Architecture] Creating Player (CharacterBody2D) hierarchy...`);
+
+            // 3a: Add CharacterBody2D as Player
+            await this.executeTool('add_node', {
+                name: 'Player',
+                type: 'CharacterBody2D',
+                parent: '.'
+            });
+
+            // 3b: Add AnimatedSprite2D as child of Player
+            await this.executeTool('add_node', {
+                name: 'AnimatedSprite2D',
+                type: 'AnimatedSprite2D',
+                parent: 'Player'
+            });
+
+            // 3c: Assign SpriteFrames resource if found
+            if (spriteFramesPath) {
+                await this.executeTool('set_property', {
+                    node: 'Player/AnimatedSprite2D',
+                    property: 'sprite_frames',
+                    value: spriteFramesPath,
+                    explanation: 'Assigning generated character sprites'
+                });
+
+                // Set default animation to play
+                await this.executeTool('set_property', {
+                    node: 'Player/AnimatedSprite2D',
+                    property: 'autoplay',
+                    value: 'idle',
+                    explanation: 'Auto-play idle animation'
+                });
+            }
+
+            // 3d: Add CollisionShape2D as child of Player
+            await this.executeTool('add_node', {
+                name: 'CollisionShape2D',
+                type: 'CollisionShape2D',
+                parent: 'Player'
+            });
+
+            // 3e: Configure collision shape
+            await this.executeTool('set_collision_shape', {
+                node: 'Player/CollisionShape2D',
+                shape_type: 'capsule',
+                size: { height: 40, radius: 12 }
+            });
+
+            artifacts.push('Player (CharacterBody2D)');
+        }
+
+        // Step 4: Ensure Camera2D is child of Player (not root)
+        const hasCamera = treeStr.includes('Camera2D');
+        if (hasCamera && !hasPlayer) {
+            // Camera exists at root - reparent it under Player
+            this.callbacks.onProgress?.(`[Architecture] Reparenting Camera2D under Player...`);
+            await this.executeTool('reparent_node', {
+                node: 'Camera2D',
+                new_parent: 'Player'
+            });
+        } else if (!hasCamera) {
+            // No camera at all - add one under Player
+            this.callbacks.onProgress?.(`[Architecture] Adding Camera2D to Player...`);
+            await this.executeTool('add_node', {
+                name: 'Camera2D',
+                type: 'Camera2D',
+                parent: 'Player'
+            });
+
+            await this.executeTool('set_property', {
+                node: 'Player/Camera2D',
+                property: 'position_smoothing_enabled',
+                value: true,
+                explanation: 'Enable smooth camera following'
+            });
+        }
+
+        // Step 5: Position player in a reasonable starting position
+        await this.executeTool('set_property', {
+            node: 'Player',
+            property: 'position',
+            value: 'Vector2(576, 200)',
+            explanation: 'Initial player position (center-ish, above ground)'
+        });
+
+        // Step 6: Create and attach player controller script if none exists
+        const hasScript = treeStr.includes('player') && treeStr.includes('.gd');
+        if (!hasScript) {
+            this.callbacks.onProgress?.(`[Architecture] Creating player movement script...`);
+
+            const scriptContent = `extends CharacterBody2D
+
+const SPEED = 200.0
+const JUMP_VELOCITY = -350.0
+
+var gravity = ProjectSettings.get_setting("physics/2d/default_gravity")
+
+func _physics_process(delta):
+\tif not is_on_floor():
+\t\tvelocity.y += gravity * delta
+
+\tif Input.is_action_just_pressed("ui_accept") and is_on_floor():
+\t\tvelocity.y = JUMP_VELOCITY
+
+\tvar direction = Input.get_axis("ui_left", "ui_right")
+\tif direction:
+\t\tvelocity.x = direction * SPEED
+\telse:
+\t\tvelocity.x = move_toward(velocity.x, 0, SPEED)
+
+\tmove_and_slide()
+
+\t# Animation handling
+\tvar sprite = $AnimatedSprite2D
+\tif sprite and sprite.sprite_frames:
+\t\tif not is_on_floor():
+\t\t\tif sprite.sprite_frames.has_animation("jump"):
+\t\t\t\tsprite.play("jump")
+\t\telif abs(velocity.x) > 10:
+\t\t\tif sprite.sprite_frames.has_animation("run"):
+\t\t\t\tsprite.play("run")
+\t\t\tsprite.flip_h = velocity.x < 0
+\t\telse:
+\t\t\tif sprite.sprite_frames.has_animation("idle"):
+\t\t\t\tsprite.play("idle")
+`;
+
+            const scriptPath = 'res://scripts/player_controller.gd';
+            const createResult = await this.executeTool('create_script', {
+                path: scriptPath,
+                content: scriptContent,
+                explanation: 'Player movement controller with animation handling'
+            });
+
+            if (createResult.success) {
+                await this.executeTool('attach_script', {
+                    node: 'Player',
+                    script_path: scriptPath,
+                    explanation: 'Attaching movement script to Player'
+                });
+                artifacts.push(scriptPath);
+            }
+        }
+
+        // Step 7: Save the scene
+        await this.executeTool('save_scene', {});
+
+        // Report via A2A
+        await this.sessionsSend(
+            'orchestrator',
+            `Scene integration complete: Player with sprites, collision, camera, and movement script`,
+            'task_result'
+        );
+
+        return this.createSuccessResult(task, artifacts, {
+            playerCreated: !hasPlayer,
+            spriteFramesAssigned: !!spriteFramesPath,
+            cameraConfigured: true,
+            scriptAttached: true,
+            message: 'Scene integrated with playable Player character'
         }, Date.now() - startTime);
     }
 

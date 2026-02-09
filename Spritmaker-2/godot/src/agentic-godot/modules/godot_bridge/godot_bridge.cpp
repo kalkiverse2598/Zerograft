@@ -263,6 +263,7 @@ void GodotBridge::_notification(int p_what) {
 			while (server->is_connection_available()) {
 				Ref<StreamPeerTCP> client = server->take_connection();
 				clients.push_back(client);
+				client_buffers.push_back(String());  // Initialize receive buffer for new client
 				int id = clients.size() - 1;
 				emit_signal("client_connected", id);
 				print_line("GodotBridge: Client connected, id=" + itos(id));
@@ -311,6 +312,9 @@ void GodotBridge::_process_client(int index) {
 	if (status == StreamPeerTCP::STATUS_ERROR || status == StreamPeerTCP::STATUS_NONE) {
 		emit_signal("client_disconnected", index);
 		clients.remove_at(index);
+		if (index < client_buffers.size()) {
+			client_buffers.remove_at(index);
+		}
 		return;
 	}
 
@@ -319,8 +323,37 @@ void GodotBridge::_process_client(int index) {
 		PackedByteArray data;
 		data.resize(available);
 		client->get_data(data.ptrw(), available);
-		String message = String::utf8((const char *)data.ptr(), available);
-		_handle_message(message, index);
+		String chunk = String::utf8((const char *)data.ptr(), available);
+
+		// Append to per-client buffer
+		if (index < client_buffers.size()) {
+			client_buffers.write[index] += chunk;
+		} else {
+			// Safety: buffer not yet allocated
+			while (client_buffers.size() <= index) {
+				client_buffers.push_back(String());
+			}
+			client_buffers.write[index] = chunk;
+		}
+
+		// Extract complete newline-delimited messages from buffer
+		String &buf = client_buffers.write[index];
+		int newline_pos;
+		while ((newline_pos = buf.find("\n")) != -1) {
+			String message = buf.substr(0, newline_pos).strip_edges();
+			buf = buf.substr(newline_pos + 1);
+			if (!message.is_empty()) {
+				_handle_message(message, index);
+			}
+		}
+
+		// Fallback: if buffer has no newline but looks like complete JSON,
+		// try to parse it directly (backward compat with non-delimited senders)
+		if (!buf.is_empty() && buf.begins_with("{") && buf.ends_with("}")) {
+			String message = buf.strip_edges();
+			buf = String();
+			_handle_message(message, index);
+		}
 	}
 }
 
@@ -367,7 +400,7 @@ void GodotBridge::send_response(int p_client, const String &p_id, const Variant 
 	response["type"] = "response";
 	response["result"] = p_result;
 
-	String json_str = JSON::stringify(response);
+	String json_str = JSON::stringify(response) + "\n";
 	clients[p_client]->put_data((const uint8_t *)json_str.utf8().get_data(), json_str.utf8().length());
 }
 
@@ -377,7 +410,7 @@ void GodotBridge::broadcast_event(const String &p_event, const Variant &p_data) 
 	event_msg["event"] = p_event;
 	event_msg["data"] = p_data;
 
-	String json_str = JSON::stringify(event_msg);
+	String json_str = JSON::stringify(event_msg) + "\n";
 	PackedByteArray bytes;
 	bytes.resize(json_str.utf8().length());
 	memcpy(bytes.ptrw(), json_str.utf8().get_data(), json_str.utf8().length());
