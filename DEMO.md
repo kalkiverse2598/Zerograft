@@ -14,7 +14,9 @@ Make sure all 4 terminals are running (see README):
 | 3 | SpriteMancer Backend | `Uvicorn running on port 8000` |
 | 4 | SpriteMancer Frontend | `ready on localhost:3000` |
 
-> Set your `GEMINI_API_KEY` in the `.env` file before starting the AI Router.
+> **API Keys:** Set your `GEMINI_API_KEY` in **two** `.env` files (setup.sh creates them from examples):
+> 1. `Spritmaker-2/godot/src/zerograft-ai/src/mcp-servers/godot/.env` — AI Router (Demos 1, 3, 4, 5)
+> 2. `Spritemancerai/backend/.env` — SpriteMancer backend (Demo 2 only, also needs `SUPABASE_URL` and `SUPABASE_KEY`)
 
 ---
 

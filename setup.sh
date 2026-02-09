@@ -81,16 +81,30 @@ cd "$REPO_ROOT/Spritmaker-2/godot/src/zerograft-ai/src/mcp-servers/godot"
 npm install
 echo "      ✓ AI Router dependencies installed"
 
-# ── 4. Setup .env from example ──
-if [ ! -f .env ]; then
-    cp .env.example .env
-    echo ""
-    echo "[4/6] Created .env from .env.example"
-    echo "      ⚠ IMPORTANT: Edit .env and set your GEMINI_API_KEY"
-    echo "        vi $(pwd)/.env"
+# ── 4. Setup .env files ──
+echo ""
+echo "[4/6] Setting up environment files..."
+
+# AI Router .env
+AI_ROUTER_DIR="$REPO_ROOT/Spritmaker-2/godot/src/zerograft-ai/src/mcp-servers/godot"
+if [ ! -f "$AI_ROUTER_DIR/.env" ]; then
+    cp "$AI_ROUTER_DIR/.env.example" "$AI_ROUTER_DIR/.env"
+    echo "      ✓ AI Router .env created"
+    echo "      ⚠ IMPORTANT: Set your GEMINI_API_KEY in:"
+    echo "        $AI_ROUTER_DIR/.env"
 else
-    echo ""
-    echo "[4/6] .env already exists, skipping"
+    echo "      ✓ AI Router .env already exists"
+fi
+
+# SpriteMancer Backend .env (needed for AI art generation)
+BACKEND_DIR="$REPO_ROOT/Spritemancerai/backend"
+if [ -f "$BACKEND_DIR/.env.example" ] && [ ! -f "$BACKEND_DIR/.env" ]; then
+    cp "$BACKEND_DIR/.env.example" "$BACKEND_DIR/.env"
+    echo "      ✓ SpriteMancer backend .env created"
+    echo "      ⚠ IMPORTANT: Set your GEMINI_API_KEY in:"
+    echo "        $BACKEND_DIR/.env"
+else
+    echo "      ✓ SpriteMancer backend .env already exists"
 fi
 
 # ── 5. Install SpriteMancer backend dependencies ──

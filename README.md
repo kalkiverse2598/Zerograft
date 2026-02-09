@@ -77,7 +77,9 @@ cd Spritemancerai/frontend
 npm run dev
 ```
 
-> **Note:** Set your `GEMINI_API_KEY` in `Spritmaker-2/godot/src/zerograft-ai/src/mcp-servers/godot/.env` before running.
+> **Note:** Set your `GEMINI_API_KEY` in **two** `.env` files before running:
+> 1. `Spritmaker-2/godot/src/zerograft-ai/src/mcp-servers/godot/.env` — for the AI Router (scene/script generation)
+> 2. `Spritemancerai/backend/.env` — for SpriteMancer (AI art generation)
 
 ### Try It Out
 
