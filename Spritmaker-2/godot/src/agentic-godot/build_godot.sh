@@ -39,6 +39,18 @@ fi
 echo "Modules linked to Godot:"
 ls -la "$GODOT_SRC/modules" | grep -E "gdcef|godot_bridge|godot_cef"
 
+# Apply patches to Godot source (e.g. expose private API for godot_bridge)
+PATCHES_DIR="$SCRIPT_DIR/patches"
+if [ -d "$PATCHES_DIR" ]; then
+    for patch in "$PATCHES_DIR"/*.patch; do
+        [ -f "$patch" ] || continue
+        echo "Applying patch: $(basename "$patch")"
+        cd "$GODOT_SRC"
+        git apply --check "$patch" 2>/dev/null && git apply "$patch" || echo "  (already applied or not needed)"
+        cd "$SCRIPT_DIR"
+    done
+fi
+
 # Detect platform
 case "$(uname -s)" in
     Darwin)

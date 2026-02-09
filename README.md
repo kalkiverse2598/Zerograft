@@ -29,7 +29,22 @@ A **multi-agent orchestrator** coordinates Character, Level, Architecture, and Q
 
 ---
 
-## Quick Start (Clone → Run)
+## Prerequisites
+
+| Tool | Version | Notes |
+|------|---------|-------|
+| **Git** | 2.x+ | With submodule support |
+| **Python 3** | 3.8+ | Required for SCons build system |
+| **SCons** | 4.x+ | `pip3 install scons` (setup.sh installs automatically if missing) |
+| **C++ Compiler** | Clang 14+ / GCC 12+ | Xcode Command Line Tools on macOS (`xcode-select --install`) |
+| **Node.js** | 18+ | For the AI Router |
+| **npm** | 9+ | Comes with Node.js |
+
+> **macOS note:** If `scons` is installed via `pip3` but not found, ensure `~/Library/Python/3.x/bin` is in your `PATH`.
+
+---
+
+## Quick Start (Clone -> Run)
 
 ```bash
 # 1. Clone with submodules (includes Godot 4.3 source + gdCEF)
@@ -39,6 +54,8 @@ cd Zerograft
 # 2. One-command setup (builds Godot, installs dependencies)
 ./setup.sh
 ```
+
+> **Build note:** The setup automatically patches the Godot 4.3 source to expose internal APIs required by the GodotBridge module (see `Spritmaker-2/godot/src/agentic-godot/patches/`). No manual patching is needed.
 
 After setup, run in separate terminals:
 
