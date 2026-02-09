@@ -27,6 +27,18 @@ export interface ScriptContext {
     language: string;
 }
 
+/** Methods that involve filesystem I/O and may need extra time */
+const SLOW_METHODS = new Set([
+    'create_scene', 'save_scene', 'open_scene',
+    'create_script', 'edit_script',
+    'create_tileset_from_image',
+    'scene_pack', 'scene_instantiate',
+    'import_resource'
+]);
+
+const DEFAULT_BRIDGE_TIMEOUT_MS = 30_000;  // 30s for normal commands
+const SLOW_BRIDGE_TIMEOUT_MS = 60_000;     // 60s for filesystem-heavy commands
+
 export class GodotBridge {
     private socket: net.Socket | null = null;
     private pendingRequests: Map<string, (result: unknown) => void> = new Map();
@@ -174,6 +186,7 @@ export class GodotBridge {
 
         const id = `bridge_${++this.requestId}`;
         const message = JSON.stringify({ id, type: "request", method, params });
+        const timeoutMs = SLOW_METHODS.has(method) ? SLOW_BRIDGE_TIMEOUT_MS : DEFAULT_BRIDGE_TIMEOUT_MS;
 
         return new Promise((resolve, reject) => {
             this.pendingRequests.set(id, resolve);
@@ -182,9 +195,9 @@ export class GodotBridge {
             setTimeout(() => {
                 if (this.pendingRequests.has(id)) {
                     this.pendingRequests.delete(id);
-                    reject(new Error(`Timeout: ${method}`));
+                    reject(new Error(`Timeout: ${method} (after ${timeoutMs / 1000}s)`));
                 }
-            }, 10000);
+            }, timeoutMs);
         });
     }
 

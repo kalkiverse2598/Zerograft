@@ -105,6 +105,10 @@ export class AgenticRouter {
     private multiAgentEnabled: boolean = false;
     private instanceId: number = Math.floor(Math.random() * 10000);
 
+    // Track last multi-agent request for retry continuity
+    private lastMultiAgentRequest: string | null = null;
+    private lastMultiAgentError: string | null = null;
+
     constructor(callbacks: AgenticRouterCallbacks, multiAgentConfig?: Partial<MultiAgentConfig>) {
         this.callbacks = callbacks;
 
@@ -370,6 +374,19 @@ export class AgenticRouter {
     }
 
     /**
+     * Detect if a user message is a retry/continuation of a previous failed task
+     */
+    private isRetryMessage(message: string): boolean {
+        const normalized = message.toLowerCase().trim();
+        const retryPhrases = [
+            'try again', 'retry', 'redo', 'do it again', 'repeat',
+            'continue', 'proceed', 'go ahead', 'yes', 'ok', 'okay',
+            'sure', 'yep', 'yeah', 'do it'
+        ];
+        return retryPhrases.some(phrase => normalized === phrase || normalized.startsWith(phrase + ' '));
+    }
+
+    /**
      * Start a new agentic task (continues conversation by default)
      * @param userMessage - The user's message
      * @param imageData - Optional base64-encoded image data (PNG format)
@@ -378,6 +395,18 @@ export class AgenticRouter {
         // Check if we should use multi-agent routing
         if (this.shouldUseMultiAgent(userMessage)) {
             await this.startMultiAgentTask(userMessage);
+            return;
+        }
+
+        // RETRY FIX: If this is a retry message and we have a previous multi-agent
+        // request that failed, re-route to multi-agent with the original request
+        if (this.isRetryMessage(userMessage) && this.lastMultiAgentRequest && this.lastMultiAgentError) {
+            console.log(`[AgenticRouter] Retry detected - re-running original request: "${this.lastMultiAgentRequest}"`);
+            this.callbacks.onProgress(`Retrying: ${this.lastMultiAgentRequest}`);
+            const originalRequest = this.lastMultiAgentRequest;
+            // Clear the error so we don't loop on repeated failures
+            this.lastMultiAgentError = null;
+            await this.startMultiAgentTask(originalRequest);
             return;
         }
 
@@ -412,6 +441,10 @@ export class AgenticRouter {
             return;
         }
 
+        // Store the request for retry continuity
+        this.lastMultiAgentRequest = userMessage;
+        this.lastMultiAgentError = null;
+
         this.callbacks.onProgress('Starting multi-agent task...');
         this.callbacks.onStateChange(TaskState.RUNNING);
 
@@ -419,6 +452,10 @@ export class AgenticRouter {
             const result = await this.multiAgentSystem.processRequest(userMessage);
 
             if (result.success) {
+                // Clear retry state on success
+                this.lastMultiAgentRequest = null;
+                this.lastMultiAgentError = null;
+
                 // Check if this was a conversational response (question answered)
                 const isConversationalResponse = result.output?.type === 'conversational_response';
                 const resultMessage = isConversationalResponse
@@ -438,10 +475,14 @@ export class AgenticRouter {
                         : ['Test the created game', 'Add more animations', 'Create additional levels']
                 });
             } else {
-                this.callbacks.onError(result.error?.message || 'Multi-agent task failed');
+                const errorMsg = result.error?.message || 'Multi-agent task failed';
+                this.lastMultiAgentError = errorMsg;
+                this.callbacks.onError(errorMsg);
             }
         } catch (error) {
-            this.callbacks.onError(error instanceof Error ? error.message : String(error));
+            const errorMsg = error instanceof Error ? error.message : String(error);
+            this.lastMultiAgentError = errorMsg;
+            this.callbacks.onError(errorMsg);
         } finally {
             this.callbacks.onStateChange(TaskState.COMPLETED);
         }
@@ -451,6 +492,8 @@ export class AgenticRouter {
      * Start a fresh task (clears conversation history)
      */
     async startFreshTask(userMessage: string): Promise<void> {
+        this.lastMultiAgentRequest = null;
+        this.lastMultiAgentError = null;
         await this.executor.startTask(userMessage, true);
     }
 
@@ -479,6 +522,8 @@ export class AgenticRouter {
      * Clear conversation history (for new session button)
      */
     clearHistory(): void {
+        this.lastMultiAgentRequest = null;
+        this.lastMultiAgentError = null;
         this.executor.startTask("", true).catch(() => { });
         this.executor.cancel();
     }
