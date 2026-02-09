@@ -26,7 +26,7 @@ index 9db1aff..22b1ce8 100644
  
  public:
  	static ScriptEditor *get_singleton() { return script_editor; }
-+	
++
 +	// Exposed for GodotBridge module access
 +	ScriptEditorBase *_get_current_editor() const;
 +	TypedArray<ScriptEditorBase> _get_open_script_editors() const;

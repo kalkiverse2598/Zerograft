@@ -75,9 +75,39 @@ echo "Building for: $PLATFORM (using $JOBS cores)"
 
 cd "$GODOT_SRC"
 
+# Find scons - check common pip install locations if not in PATH
+SCONS_CMD="scons"
+if ! command -v scons &> /dev/null; then
+    echo "scons not in PATH, searching pip install locations..."
+    for PY_VER in 3.12 3.11 3.10 3.9 3.8; do
+        PY_BIN="$HOME/Library/Python/$PY_VER/bin"
+        if [ -x "$PY_BIN/scons" ]; then
+            echo "Found scons at $PY_BIN/scons"
+            export PATH="$PY_BIN:$PATH"
+            SCONS_CMD="$PY_BIN/scons"
+            break
+        fi
+    done
+    # Also check Linux pip locations
+    for PY_BIN in "$HOME/.local/bin" "/usr/local/bin"; do
+        if [ -x "$PY_BIN/scons" ]; then
+            echo "Found scons at $PY_BIN/scons"
+            export PATH="$PY_BIN:$PATH"
+            SCONS_CMD="$PY_BIN/scons"
+            break
+        fi
+    done
+fi
+
+# Final check
+if ! command -v $SCONS_CMD &> /dev/null; then
+    echo "ERROR: scons not found. Please install with: pip3 install scons"
+    exit 1
+fi
+
 # Build editor
 echo "Starting Godot build..."
-scons platform=$PLATFORM target=editor -j$JOBS
+$SCONS_CMD platform=$PLATFORM target=editor -j$JOBS
 
 echo "=== Build Complete ==="
 echo "Editor binary location:"
