@@ -10,13 +10,13 @@ echo "=== ZeroGraft Setup ==="
 echo ""
 
 # ── 1. Init submodules if not already done ──
-echo "[1/5] Initializing submodules (Godot 4.3 + gdCEF)..."
+echo "[1/6] Initializing submodules (Godot 4.3 + gdCEF)..."
 git submodule update --init --recursive --depth 1
 echo "      ✓ Submodules ready"
 
 # ── 2. Build Godot with AI modules ──
 echo ""
-echo "[2/5] Building Godot with Agentic modules..."
+echo "[2/6] Building Godot with Agentic modules..."
 cd "$REPO_ROOT/Spritmaker-2/godot/src/agentic-godot"
 
 # Check for scons and install if missing
@@ -58,7 +58,7 @@ echo "      ✓ Godot built"
 
 # ── 3. Install AI Router dependencies ──
 echo ""
-echo "[3/5] Installing AI Router (ZeroGraft AI) dependencies..."
+echo "[3/6] Installing AI Router (ZeroGraft AI) dependencies..."
 cd "$REPO_ROOT/Spritmaker-2/godot/src/zerograft-ai/src/mcp-servers/godot"
 npm install
 echo "      ✓ AI Router dependencies installed"
@@ -67,24 +67,33 @@ echo "      ✓ AI Router dependencies installed"
 if [ ! -f .env ]; then
     cp .env.example .env
     echo ""
-    echo "[4/5] Created .env from .env.example"
+    echo "[4/6] Created .env from .env.example"
     echo "      ⚠ IMPORTANT: Edit .env and set your GEMINI_API_KEY"
     echo "        vi $(pwd)/.env"
 else
     echo ""
-    echo "[4/5] .env already exists, skipping"
+    echo "[4/6] .env already exists, skipping"
 fi
 
 # ── 5. Install SpriteMancer backend dependencies ──
 echo ""
-echo "[5/5] Installing SpriteMancer backend dependencies..."
+echo "[5/6] Installing SpriteMancer backend dependencies..."
 if [ -d "$REPO_ROOT/Spritemancerai/backend" ]; then
     cd "$REPO_ROOT/Spritemancerai/backend"
     if [ -f requirements.txt ]; then
-        pip3 install -r requirements.txt 2>/dev/null || echo "      ⚠ pip install failed - install manually: pip3 install -r Spritemancerai/backend/requirements.txt"
+        pip3 install -r requirements.txt || echo "      ⚠ pip install failed - install manually: pip3 install -r Spritemancerai/backend/requirements.txt"
     fi
 fi
-echo "      ✓ SpriteMancer dependencies installed"
+echo "      ✓ SpriteMancer backend dependencies installed"
+
+# ── 6. Install SpriteMancer frontend dependencies ──
+echo ""
+echo "[6/6] Installing SpriteMancer frontend dependencies..."
+if [ -d "$REPO_ROOT/Spritemancerai/frontend" ]; then
+    cd "$REPO_ROOT/Spritemancerai/frontend"
+    npm install
+fi
+echo "      ✓ SpriteMancer frontend dependencies installed"
 
 echo ""
 echo "=== Setup Complete ==="
@@ -101,7 +110,7 @@ echo "     npm run dev"
 echo ""
 echo "  3. Start SpriteMancer backend (in another terminal):"
 echo "     cd Spritemancerai/backend"
-echo "     uvicorn main:app --reload --port 8000"
+echo "     python3 -m uvicorn main:app --reload --port 8000"
 echo ""
 echo "  4. Start SpriteMancer frontend (in another terminal):"
 echo "     cd Spritemancerai/frontend"

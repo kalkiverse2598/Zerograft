@@ -70,7 +70,7 @@ npm run dev
 
 # Terminal 3: SpriteMancer Backend
 cd Spritemancerai/backend
-uvicorn main:app --reload --port 8000
+python3 -m uvicorn main:app --reload --port 8000
 
 # Terminal 4: SpriteMancer Frontend
 cd Spritemancerai/frontend
