@@ -79,6 +79,10 @@ npm run dev
 
 > **Note:** Set your `GEMINI_API_KEY` in `Spritmaker-2/godot/src/zerograft-ai/src/mcp-servers/godot/.env` before running.
 
+### Try It Out
+
+See **[DEMO.md](DEMO.md)** for step-by-step prompts you can paste into the AI Panel to see scene creation, GDScript generation, AI art, and multi-step game building in action.
+
 ---
 
 ## Architecture

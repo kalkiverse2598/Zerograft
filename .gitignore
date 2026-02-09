@@ -53,6 +53,7 @@ tsconfig.tsbuildinfo
 # ========================
 # Godot Engine Build Artifacts (source included as submodules)
 # ========================
+Spritmaker-2/godot/src/agentic-godot/project/
 Spritmaker-2/godot/src/agentic-godot/godot-engine/bin/
 Spritmaker-2/godot/src/agentic-godot/gdcef/addons/gdcef/thirdparty/
 # ZeroGraft AI Router (include source, exclude build artifacts)
