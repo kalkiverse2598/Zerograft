@@ -64,7 +64,7 @@ After setup, run in separate terminals:
 cd Spritmaker-2/godot/src/agentic-godot/godot-engine
 ./bin/godot.macos.editor.arm64 --editor --path ../project
 
-# Terminal 2: AI Router
+# Terminal 2: AI Router( not required as it is running with Editor itself)
 cd Spritmaker-2/godot/src/zerograft-ai/src/mcp-servers/godot
 npm run dev
 
